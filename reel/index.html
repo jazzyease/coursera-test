@@ -122,7 +122,7 @@
       }
       /* Word = 3 stacked layers of the same glyphs:
          ::before  dark extrusion (3D depth) + drop shadow, behind
-         face      solid colour + glow + RGB-split shadows (what contrast checks read)
+         face      solid colour + soft glow (what contrast checks read)
          ::after   gradient fill + moving light sweep, clipped to the glyphs, in front */
       .w {
         position: relative;
@@ -138,18 +138,15 @@
         font-size: 80px;
         line-height: 1.02;
         transform-origin: 50% 70%;
-        --rgb: 0px;
         --shine: -40%;
         --fill: linear-gradient(180deg, #ffffff 0%, #f4f4ef 46%, #d4d6df 72%, #b3b6c4 100%);
         --ext: #2b2731;
-        --glow: rgba(251, 251, 246, 0.28);
-        --glow2: rgba(251, 251, 246, 0.12);
+        --glow: rgba(251, 251, 246, 0.18);
+        --glow2: rgba(14, 11, 16, 0.35);
         color: var(--white);
         text-shadow:
-          calc(var(--rgb) * -1) 0 0 rgba(0, 229, 255, 0.8),
-          var(--rgb) 0 0 rgba(255, 46, 63, 0.85),
-          0 0 18px var(--glow),
-          0 0 52px var(--glow2);
+          0 0 14px var(--glow),
+          0 0 30px var(--glow2);
       }
       .w::before,
       .w::after {
@@ -172,10 +169,7 @@
           0.02em 0.024em 0 var(--ext),
           0.03em 0.036em 0 var(--ext),
           0.04em 0.048em 0 var(--ext),
-          0.05em 0.06em 0 var(--ext),
-          0.06em 0.072em 0 var(--ext),
-          0.07em 0.084em 0 var(--ext),
-          0.04em 0.16em 0.22em rgba(14, 11, 16, 0.85);
+          0.03em 0.12em 0.18em rgba(14, 11, 16, 0.75);
       }
       .w::after {
         z-index: 1;
@@ -197,46 +191,15 @@
         color: var(--lime);
         --fill: linear-gradient(180deg, #fcffd9 0%, #f0fb8a 34%, #e6f54a 58%, #b5cd10 100%);
         --ext: #3f4a04;
-        --glow: rgba(230, 245, 74, 0.6);
-        --glow2: rgba(230, 245, 74, 0.3);
+        --glow: rgba(230, 245, 74, 0.38);
+        --glow2: rgba(14, 11, 16, 0.3);
       }
       .w.red {
         color: var(--alarm);
         --fill: linear-gradient(180deg, #ffc2c9 0%, #ff6674 32%, #ff2e3f 58%, #b50b22 100%);
         --ext: #4d0610;
-        --glow: rgba(255, 46, 63, 0.7);
-        --glow2: rgba(255, 46, 63, 0.35);
-      }
-      /* Soft coloured haze behind each caption group */
-      .haze {
-        position: absolute;
-        left: 40px;
-        right: 40px;
-        top: 10px;
-        bottom: 10px;
-        opacity: 0;
-        z-index: -1;
-      }
-      .tone-lime .haze {
-        background: radial-gradient(closest-side, rgba(230, 245, 74, 0.26), rgba(230, 245, 74, 0));
-      }
-      .tone-red .haze {
-        background: radial-gradient(closest-side, rgba(255, 46, 63, 0.34), rgba(255, 46, 63, 0));
-      }
-      .tone-white .haze {
-        background: radial-gradient(closest-side, rgba(251, 251, 246, 0.16), rgba(251, 251, 246, 0));
-      }
-      /* Light streak that slices behind the caption on entry (luemmy21) */
-      #streak {
-        position: absolute;
-        left: -300px;
-        top: 150px;
-        width: 1680px;
-        height: 4px;
-        border-radius: 2px;
-        background: linear-gradient(90deg, rgba(251, 251, 246, 0), rgba(230, 245, 74, 0.9) 42%, #fbfbf6 50%, rgba(230, 245, 74, 0.9) 58%, rgba(251, 251, 246, 0));
-        box-shadow: 0 0 18px 4px rgba(230, 245, 74, 0.55);
-        opacity: 0;
+        --glow: rgba(255, 46, 63, 0.45);
+        --glow2: rgba(14, 11, 16, 0.3);
       }
       .badge {
         display: flex;
@@ -263,14 +226,6 @@
         padding-right: 6px;
         text-shadow: 0 2px 0 rgba(251, 251, 246, 0.6);
       }
-      /* Behind-subject light: bokeh + god rays (between the dimmed room and her cutout) */
-      #bgfx {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 1080px;
-        height: 1920px;
-      }
     </style>
   </head>
   <body>
@@ -281,7 +236,6 @@
         </div>
         <div data-hf-id="hf-dd6x" class="layer" id="dim"></div>
         <div data-hf-id="hf-10av" class="layer" id="redbg"></div>
-        <canvas data-hf-id="hf-96gt" id="bgfx" width="1080" height="1920"></canvas>
         <!-- Subject cutout (hyperframes remove-background) re-laid over the dimmed room -->
         <div data-hf-id="hf-j20a" class="layer" id="cutout-wrap">
           <video data-hf-id="hf-8hoq" id="subject" class="clip" src="assets/media/subject.webm" muted playsinline data-start="0" data-media-start="0" data-duration="10.12" data-track-index="1"></video>
@@ -300,9 +254,7 @@
       <!-- SFX from the HyperFrames bundled library, mixed under the voice -->
       <audio data-hf-id="hf-lkd7" id="sfx-pp-in" src="assets/sfx/whoosh-short.mp3" data-start="0.02" data-duration="0.57" data-track-index="15" data-volume="0.3"></audio>
       <audio data-hf-id="hf-97j0" id="sfx-fan" src="assets/sfx/whoosh.mp3" data-start="1.96" data-duration="0.57" data-track-index="15" data-volume="0.26"></audio>
-      <audio data-hf-id="hf-4kys" id="sfx-scan" src="assets/sfx/click-soft.mp3" data-start="3.52" data-duration="0.36" data-track-index="16" data-volume="0.5"></audio>
       <audio data-hf-id="hf-wyc6" id="sfx-flap" src="assets/sfx/click-soft.mp3" data-start="8.44" data-duration="0.36" data-track-index="16" data-volume="0.5"></audio>
-      <audio data-hf-id="hf-9xi9" id="sfx-glitch" src="assets/sfx/glitch-2.mp3" data-start="0.94" data-duration="0.5" data-track-index="17" data-volume="0.14"></audio>
       <audio data-hf-id="hf-avpq" id="sfx-rejected" src="assets/sfx/impact-bass-1.mp3" data-start="0.94" data-duration="1.2" data-track-index="11" data-volume="0.32"></audio>
       <audio data-hf-id="hf-or83" id="sfx-badge" src="assets/sfx/pop.mp3" data-start="2.3" data-duration="0.7" data-track-index="12" data-volume="0.3"></audio>
       <audio data-hf-id="hf-oezk" id="sfx-doc" src="assets/sfx/whoosh-short.mp3" data-start="2.3" data-duration="0.57" data-track-index="13" data-volume="0.34"></audio>
@@ -375,9 +327,6 @@
         const el = document.createElement("div");
         el.className = "cg tone-" + g.tone;
         el.id = "cg-" + gi;
-        const hz = document.createElement("div");
-        hz.className = "haze";
-        el.appendChild(hz);
         if (g.l1.length) {
           const l1 = document.createElement("div");
           l1.className = "cl l1";
@@ -414,41 +363,20 @@
       function slideIn(sel, t) {
         tl.fromTo(sel, { opacity: 0, x: -46, skewX: -10 }, { opacity: 1, x: 0, skewX: 0, duration: 0.22, ease: "expo.out" }, t);
       }
-      // Hero words flip in from depth, land with an RGB split, then settle.
+      // Hero words land with a short scale-down; no overshoot.
       function slam(sel, t) {
-        tl.fromTo(
-          sel,
-          { opacity: 0, scale: 2.1, rotationX: -72, z: 0, transformPerspective: 700 },
-          { opacity: 1, scale: 1, rotationX: 0, duration: 0.14, ease: "power4.in" },
-          t - 0.1,
-        );
-        tl.fromTo(sel, { "--rgb": "16px" }, { "--rgb": "0px", duration: 0.26, ease: "power2.out" }, t + 0.04);
-        tl.to(sel, { scale: 1.06, duration: 0.08, ease: "power2.out" }, t + 0.04);
-        tl.to(sel, { scale: 1, duration: 0.4, ease: "back.out(2.4)" }, t + 0.12);
+        tl.fromTo(sel, { opacity: 0, scale: 1.28 }, { opacity: 1, scale: 1, duration: 0.16, ease: "power3.out" }, t - 0.06);
       }
       function shine(sel, t, dur = 0.5) {
         tl.fromTo(sel, { "--shine": "-40%" }, { "--shine": "140%", duration: dur, ease: "power2.inOut" }, t);
       }
 
-      const streak = document.createElement("div");
-      streak.id = "streak";
-      document.getElementById("captions").appendChild(streak);
-
       GROUPS.forEach((g, gi) => {
         buildGroup(g, gi);
         const el = "#cg-" + gi;
         tl.set(el, { opacity: 1, visibility: "visible" }, g.start);
-        tl.fromTo(el + " .haze", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" }, g.start);
-        // Streak slices through on each accent line's first word.
-        const tS = Math.max(0.02, W[g.l2[0][0]][0] - 0.06);
-        tl.fromTo("#streak", { x: -1500, rotation: -8, opacity: 1 }, { x: 1500, duration: 0.42, ease: "power2.inOut" }, tS);
-        tl.set("#streak", { opacity: 0 }, tS + 0.42);
-        // Light sweep across every word shortly after it lands; hero words get a slower, later pass.
-        g.l1.forEach((wi) => shine("#w-" + wi, Math.max(0.05, W[wi][0] + 0.1), 0.45));
-        g.l2.flat().forEach((wi) => {
-          const hero = g.hero && g.hero.includes(wi);
-          shine("#w-" + wi, W[wi][0] + (hero ? 0.3 : 0.16), hero ? 0.6 : 0.45);
-        });
+        // One slow light pass across hero words only.
+        (g.hero || []).forEach((wi) => shine("#w-" + wi, W[wi][0] + 0.3, 0.7));
         g.l1.forEach((wi) => (W[wi][0] < 0.9 ? tl.set("#w-" + wi, { opacity: 1 }, 0) : ghostIn("#w-" + wi, W[wi][0] - LEAD)));
         g.l2.flat().forEach((wi) => {
           const t = W[wi][0] - LEAD;
@@ -464,14 +392,12 @@
       });
 
       // ---------- Colour moments ----------
-      // Red background behind her on "rejected" with a two-frame strobe.
-      tl.set("#redbg", { opacity: 1 }, 0.9);
-      tl.set("#redbg", { opacity: 0.15 }, 0.98);
-      tl.set("#redbg", { opacity: 1 }, 1.02);
+      // Red background behind her on "rejected".
+      tl.set("#redbg", { opacity: 1 }, 0.94);
       tl.to("#redbg", { opacity: 0, duration: 0.3, ease: "power2.in" }, 1.6);
 
       // Black-and-white from "rejection" to the end; the red type and stamp stay the only colour.
-      tl.set("#flash", { opacity: 0.85 }, 7.54);
+      tl.set("#flash", { opacity: 0.4 }, 7.54);
       tl.to("#flash", { opacity: 0, duration: 0.16, ease: "power2.out" }, 7.58);
       tl.set("#bw-wrap", { opacity: 1 }, 7.54);
 
@@ -480,12 +406,12 @@
       tl.to("#blur-wrap", { opacity: 0, duration: 0.06, ease: "none" }, 5.08);
 
       // ---------- Camera ----------
-      // Hook: open tight and whip out so frame 0 already moves.
-      cam({ scale: 1.34, x: 0, y: 0, rotation: -2.5 }, 0);
-      cam({ scale: 1.03, rotation: 0 }, 0, 0.32, "expo.out");
-      cam({ scale: 1.08 }, 0.32, 0.58);
-      cam({ scale: 1.2 }, 0.9, 0.12, "expo.out"); // "rejected"
-      shake(0.96, 12);
+      // Hook: open slightly tight and settle out so frame 0 already moves.
+      cam({ scale: 1.16, x: 0, y: 0 }, 0);
+      cam({ scale: 1.04 }, 0, 0.45, "power3.out");
+      cam({ scale: 1.08 }, 0.45, 0.45);
+      cam({ scale: 1.16 }, 0.92, 0.14, "power3.out"); // "rejected"
+      shake(0.96, 5);
       cam({ scale: 1.24 }, 1.05, 0.9);
       cam({ scale: 1.0 }, 1.96); // jump zoom out
       cam({ scale: 1.08 }, 1.96, 2.44);
@@ -494,68 +420,12 @@
       cam({ scale: 1.18 }, 5.12, 1.72);
       cam({ scale: 1.02 }, 6.84); // jump out
       cam({ scale: 1.05 }, 6.84, 0.7);
-      cam({ scale: 1.2 }, 7.54, 0.12, "expo.out"); // "rejection"
+      cam({ scale: 1.16 }, 7.54, 0.14, "power3.out"); // "rejection"
       cam({ scale: 1.22 }, 7.7, 0.58);
       cam({ scale: 1.06 }, 8.28); // jump out for the letter
       cam({ scale: 1.12 }, 8.28, 1.84);
-      shake(9.05, 10); // stamp lands
+      shake(9.05, 4); // stamp lands
 
-      // ---------- Behind-subject light: bokeh depth + hook god rays ----------
-      const bg = document.getElementById("bgfx").getContext("2d");
-      const prng = (seed) => () => {
-        seed = (seed + 0x6d2b79f5) | 0;
-        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-      };
-      const R = prng(42);
-      const BOKEH = Array.from({ length: 30 }, () => ({
-        x: R() * 1080, y: R() * 1920, r: 6 + R() * R() * 34, v: 14 + R() * 40,
-        ph: R() * 6.28, f: 0.4 + R() * 0.9, lime: R() < 0.3, sway: 10 + R() * 30,
-      }));
-      function rays(t, t0, t1, cx, cy, rgb) {
-        if (t < t0 || t > t1) return;
-        const k = Math.min(1, (t - t0) / 0.12) * Math.min(1, (t1 - t) / 0.3);
-        bg.save();
-        bg.translate(cx, cy);
-        bg.rotate((t - t0) * 0.35);
-        const grd = bg.createRadialGradient(0, 0, 40, 0, 0, 1150);
-        grd.addColorStop(0, "rgba(" + rgb + "," + (0.55 * k).toFixed(3) + ")");
-        grd.addColorStop(1, "rgba(" + rgb + ",0)");
-        bg.fillStyle = grd;
-        for (let i = 0; i < 14; i++) {
-          const a = (i / 14) * Math.PI * 2, w = 0.07 + 0.05 * Math.sin(i * 2.3);
-          bg.beginPath();
-          bg.moveTo(0, 0);
-          bg.arc(0, 0, 1150, a - w, a + w);
-          bg.closePath();
-          bg.fill();
-        }
-        bg.restore();
-      }
-      function renderBg(t) {
-        bg.clearRect(0, 0, 1080, 1920);
-        rays(t, 0.9, 1.96, 560, 640, "255,236,238");
-        bg.globalCompositeOperation = "lighter";
-        for (const b of BOKEH) {
-          const y = ((b.y - t * b.v) % 1920 + 1920) % 1920;
-          const x = b.x + Math.sin(t * b.f + b.ph) * b.sway;
-          const a = 0.1 + 0.08 * Math.sin(t * b.f * 2 + b.ph);
-          const g = bg.createRadialGradient(x, y, 0, x, y, b.r);
-          const c = b.lime ? "230,245,74" : "255,240,220";
-          g.addColorStop(0, "rgba(" + c + "," + a.toFixed(3) + ")");
-          g.addColorStop(0.6, "rgba(" + c + "," + (a * 0.6).toFixed(3) + ")");
-          g.addColorStop(1, "rgba(" + c + ",0)");
-          bg.fillStyle = g;
-          bg.beginPath();
-          bg.arc(x, y, b.r, 0, Math.PI * 2);
-          bg.fill();
-        }
-        bg.globalCompositeOperation = "source-over";
-      }
-      const clock = { t: 0 };
-      tl.to(clock, { t: 10.12, duration: 10.12, ease: "none", onUpdate: () => renderBg(clock.t) }, 0);
-      renderBg(0);
 
       window.__timelines["main"] = tl;
     </script>

@@ -36,14 +36,12 @@ editorial) was rejected by the user.
   118%, uppercase, tracking -0.01em. Line 1 ≈ 80px; accent lines 84–156px (pre-sized to ≤940px).
 - **JetBrains Mono** (bundled): passport machine-readable-zone chevrons only.
 
-### Caption finish (v4, user asked for gradient / glow / 3D depth)
+### Caption finish (v4 asked for gradient / glow / 3D depth; v5 toned it down to remove "AI slop")
 
 Each word is three stacked layers of the same glyphs:
-1. `::before`: dark tone extrusion (8 stepped em-based shadows down-right, matching the italic)
-   plus a soft drop shadow, for 3D depth.
-2. Face: solid tone colour + two-radius glow + RGB-split shadows (driven by `--rgb`). This is the
-   layer the contrast audit reads.
-3. `::after`: vertical gradient fill clipped to the glyphs, with a moving light sweep (`--shine`).
+1. `::before`: short dark tone extrusion (4 stepped em-based shadows) plus a soft drop shadow.
+2. Face: solid tone colour + a soft tone glow. This is the layer the contrast audit reads.
+3. `::after`: vertical gradient fill clipped to the glyphs; hero words get one slow light pass.
 
 | Tone  | Gradient (top → bottom)                     | Extrusion |
 | ----- | ------------------------------------------- | --------- |
@@ -51,9 +49,7 @@ Each word is three stacked layers of the same glyphs:
 | Lime  | `#FCFFD9` → `#F0FB8A` → `#E6F54A` → `#B5CD10` | `#3F4A04` |
 | Red   | `#FFC2C9` → `#FF6674` → `#FF2E3F` → `#B50B22` | `#4D0610` |
 
-Plus a tone-coloured haze behind each group, a light streak that slices behind each accent
-line (luemmy21), and hero words ("REJECTED", "WHY", "ARRIVES") that flip in from depth with an
-RGB split and overshoot.
+Hero words ("REJECTED", "WHY", "ARRIVES") land with a short 1.28→1 scale, no overshoot.
 
 ## Layout (1080×1920)
 
@@ -68,9 +64,7 @@ RGB split and overshoot.
 - Background dimmed ~40% using the HyperFrames `remove-background` cutout (subject re-laid on
   top), so she stays bright like the references' lit speakers in dark rooms.
 - Red flash: solid Alarm layer between the dimmed plate and the cutout.
-- `#bgfx` canvas, also between plate and cutout (behind her): drifting bokeh for depth throughout,
-  and rotating god rays behind her head during the hook (0.9–1.96s).
-- Hook: opens at 1.34× with a slight roll and whips out in 0.32s, so frame 0 is already moving.
+- Hook: opens at 1.16× and settles out over 0.45s, so frame 0 is already moving (no roll).
 - B&W and blur moments are ffmpeg-preprocessed variants of the source (`assets/media/`),
   cross-faded as layers. They're deterministic and cheap, with no shader cost.
 
@@ -79,21 +73,17 @@ RGB split and overshoot.
 - Captions hard-swap between phrases (no fades), as in the references.
 - Camera: jump zooms at phrase starts; 0.12–0.16s punches on "rejected" / "rejection"; slow
   push-ins in between; 3-frame shake on impacts. Origin = her face.
-- Motion graphics are JS-built CSS-3D objects (v3; the user rejected the flat SVG cards).
-  One reusable sub-composition per story beat, each on its own local clock:
-  - `compositions/passport.html`: open passport (cover thickness layers, hinged pages, generated
-    guilloche security pattern, rotating foil seal). "REJECTED" stamp slams at 0.96s with ink
-    splatter and a shockwave.
-  - `compositions/doc-stack.html`: five sheets fan in, four fall away on "one", the chosen sheet
-    comes forward with a glint + lime outline, a scan beam passes on "probably", and a marker ring
-    draws on "why".
-  - `compositions/envelope.html`: envelope spins in, the flap opens in 3D, the letter slides out,
-    and the stamp slams with ink and a shockwave.
-- Each object has a flat backlight halo (lime; switches to red on each stamp) that follows it,
-  plus rim-light edges.
-- Every object floats on layered sines (y / rotX / rotY / rotZ at different frequencies) with a
-  sheen that follows the tilt. Canvas FX (ink, shockwave, sparks, marker) use a seeded PRNG and
-  are drawn from one GSAP clock `onUpdate`, so every frame is reproducible and seek-safe.
+- Props (v5) are photoreal pre-renders from `tools/make_assets.py` (numpy/PIL, fixed seeds): paper
+  grain + fibres, lit pebbled-leather cover, pastel guilloche security print, a hologram foil, fine
+  print made of seeded pseudo-words (too small to read, so no invented copy), a curved-gutter bend,
+  and a worn rubber-stamp ink texture. The passport photo is the subject herself (source frame at
+  4.8s, cut out with `hyperframes remove-background`, greyscale). Field values are "XXXX" placeholders.
+- `compositions/passport.html`, `doc-stack.html`, `envelope.html` place those PNGs in CSS 3D with
+  a thin cover edge, a blurred contact shadow, and a soft-light sheen masked to the prop that
+  follows the tilt. The stamp presses down (1.3→1 scale, 0.11s) and the prop gives 1.5%.
+- Motion is a slow, low-amplitude drift (≤5px, ≤4° yaw). Camera shakes are 4–5px.
+- Removed in v5 as exaggeration: god rays, bokeh, light streaks, caption haze, RGB-split glitch
+  and glitch SFX, red strobe, ink splatter, shockwave rings and sparks, glowing halos, scan beam.
 
 ## Don'ts
 

@@ -6,14 +6,6 @@
   <body>
     <template>
       <style>
-
-        @font-face {
-          font-family: "Archivo";
-          src: url("assets/fonts/Archivo-Italic-Variable.woff2") format("woff2");
-          font-weight: 100 900;
-          font-stretch: 62% 125%;
-          font-style: italic;
-        }
         #root {
           position: absolute;
           inset: 0;
@@ -23,237 +15,90 @@
         .stage {
           position: absolute;
           inset: 0;
-          perspective: 1500px;
+          perspective: 1600px;
           perspective-origin: 50% 900px;
         }
-        .obj,
-        .floater,
-        .impact {
+        /* Spread is rendered at 2x (tools/make_assets.py); shown at 674x474. */
+        #pp {
           position: absolute;
+          left: 203px;
+          top: 755px;
+          width: 674px;
+          height: 474px;
           transform-style: preserve-3d;
         }
-        .floater,
-        .impact {
-          inset: 0;
-        }
-        .shadow {
-          position: absolute;
-          left: -60px;
-          right: -60px;
-          top: 40px;
-          bottom: -80px;
-          background: radial-gradient(ellipse 50% 45% at 50% 55%, rgba(14, 11, 16, 0.6), rgba(14, 11, 16, 0) 72%);
-          transform: translateZ(-70px);
-        }
-        .sheen {
+        .pp-float,
+        .pp-body {
           position: absolute;
           inset: 0;
-          border-radius: inherit;
-          background: linear-gradient(115deg, rgba(251, 251, 246, 0) 30%, rgba(251, 251, 246, 0.85) 50%, rgba(251, 251, 246, 0) 70%);
-          background-size: 260% 100%;
-          mix-blend-mode: soft-light;
-          opacity: 0.2;
+          transform-style: preserve-3d;
         }
-        canvas.fill {
+        .pp-contact {
           position: absolute;
-          left: 0;
-          top: 0;
-        }
-        .ln {
-          position: absolute;
-          left: 26px;
-          height: 12px;
-          border-radius: 6px;
-          background: #c9cbd3;
-        }
-        .stamp {
-          position: absolute;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 7px solid #ff2e3f;
-          border-radius: 14px;
-          box-sizing: border-box;
-          color: #ff2e3f;
-          font-family: "Archivo", sans-serif;
-          font-style: italic;
-          font-weight: 900;
-          font-stretch: 118%;
-          line-height: 1;
-          mix-blend-mode: multiply;
-          -webkit-mask-size: 100% 100%;
-          mask-size: 100% 100%;
-        }
-
-        .fxc {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 1080px;
-          height: 1920px;
-        }
-      /* ---------- Passport (open spread) ---------- */
-        #pp {
-          left: 220px;
-          top: 800px;
-          width: 640px;
-          height: 440px;
-        }
-        .pp-cover {
-          position: absolute;
-          inset: -14px -18px;
-          border-radius: 24px;
-          background: linear-gradient(160deg, #2a3458, #1b2340 55%, #141a31);
-          box-shadow:
-            inset 0 0 0 3px #2a3458,
-            inset 0 2px 0 rgba(251, 251, 246, 0.35),
-            0 34px 70px rgba(14, 11, 16, 0.6);
-        }
-        .pp-cover.z0 {
-          transform: translateZ(-8px);
-        }
-        .pp-cover.z1 {
-          transform: translateZ(-5px);
-          background: #2a3458;
-        }
-        .pp-cover.z2 {
-          transform: translateZ(-2px);
-          background: #2a3458;
-        }
-        .page {
-          position: absolute;
-          top: 0;
-          width: 320px;
-          height: 440px;
-          background: #efebe1;
-          overflow: hidden;
-        }
-        .page.left {
-          left: 0;
-          border-radius: 16px 4px 4px 16px;
-          transform-origin: 100% 50%;
-          transform: rotateY(9deg);
-          box-shadow: inset -26px 0 30px -18px rgba(14, 11, 16, 0.45);
-        }
-        .page.right {
-          left: 320px;
-          border-radius: 4px 16px 16px 4px;
-          transform-origin: 0% 50%;
-          transform: rotateY(-9deg);
-          box-shadow: inset 26px 0 30px -18px rgba(14, 11, 16, 0.45);
-        }
-        .photo {
-          position: absolute;
-          left: 26px;
-          top: 62px;
-          width: 112px;
-          height: 142px;
-          border-radius: 8px;
-          background:
-            radial-gradient(circle at 50% 38%, #8d8f99 0 22px, transparent 23px),
-            radial-gradient(ellipse 48px 40px at 50% 112%, #8d8f99 0 100%, transparent 100%),
-            #c9cbd3;
-          box-shadow: inset 0 0 0 3px rgba(14, 11, 16, 0.18);
-        }
-        .mrz {
-          position: absolute;
-          left: 22px;
-          bottom: 22px;
-          font-family: "JetBrains Mono", monospace;
-          font-weight: 700;
-          font-size: 16px;
-          letter-spacing: 0.06em;
-          line-height: 1.35;
-          color: #0e0b10;
-        }
-        .visa-h {
-          position: absolute;
-          left: 24px;
-          top: 22px;
-          font-family: "Archivo", sans-serif;
-          font-style: italic;
-          font-weight: 900;
-          font-stretch: 118%;
-          font-size: 62px;
-          color: #0e0b10;
-        }
-        .foil {
-          position: absolute;
-          right: 24px;
-          top: 24px;
-          width: 84px;
-          height: 84px;
+          left: 4%;
+          right: 4%;
+          top: 14%;
+          bottom: -10%;
           border-radius: 50%;
-          box-shadow:
-            inset 0 0 0 3px rgba(14, 11, 16, 0.25),
-            0 4px 12px rgba(14, 11, 16, 0.2);
+          background: rgba(14, 11, 16, 0.55);
+          filter: blur(34px);
+          transform: translateZ(-60px);
+        }
+        .pp-edge {
+          position: absolute;
+          inset: 3px 2px -5px 2px;
+          border-radius: 22px;
+          background: #111629;
+          transform: translateZ(-7px);
+        }
+        .pp-img {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 674px;
+          height: 474px;
+        }
+        /* Soft specular sweep, clipped to the spread's alpha so it never lands on the video. */
+        .pp-sheen {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(112deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.55) 50%, rgba(255, 255, 255, 0) 62%);
+          background-size: 300% 100%;
+          mix-blend-mode: soft-light;
+          -webkit-mask: url("assets/props/passport-spread.png") center / 100% 100% no-repeat;
+          mask: url("assets/props/passport-spread.png") center / 100% 100% no-repeat;
+        }
+        /* Hologram shimmer: sits exactly over the foil patch on the visa sticker. */
+        .pp-holo {
+          position: absolute;
+          left: 596px;
+          top: 68px;
+          width: 58px;
+          height: 58px;
+          border-radius: 50%;
+          mix-blend-mode: overlay;
         }
         .pp-stamp {
-          left: 26px;
-          top: 250px;
-          width: 266px;
-          height: 96px;
-          font-size: 38px;
-        }
-
-                /* Backlight halo behind each object; pops it off the footage */
-        #pp-halo {
           position: absolute;
-          left: -40px;
-          top: 560px;
-          width: 1160px;
-          height: 920px;
-        }
-        .halo {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-        }
-        .halo.a {
-          background: radial-gradient(closest-side, rgba(230, 245, 74, 0.42), rgba(230, 245, 74, 0.12) 55%, rgba(230, 245, 74, 0));
-        }
-        .halo.b {
-          background: radial-gradient(closest-side, rgba(255, 46, 63, 0.6), rgba(255, 46, 63, 0.16) 55%, rgba(255, 46, 63, 0));
-          opacity: 0;
+          left: 367px;
+          top: 267px;
+          width: 290px;
+          height: 129px;
+          mix-blend-mode: multiply;
         }
       </style>
 
       <div id="root" data-composition-id="passport" data-width="1080" data-height="1920">
-        <canvas class="fxc" width="1080" height="1920"></canvas>
         <div class="stage">
-          <!-- Passport: "Your visa got rejected" -->
-          <div class="halo-wrap" id="pp-halo"><div class="halo a"></div><div class="halo b"></div></div>
-          <div class="obj" id="pp">
-            <div class="floater">
-              <div class="shadow"></div>
-              <div class="impact" id="pp-impact">
-                <div class="pp-cover z0"></div>
-                <div class="pp-cover z1"></div>
-                <div class="pp-cover z2"></div>
-                <div class="page left">
-                  <canvas class="fill guil" width="320" height="440"></canvas>
-                  <div class="photo"></div>
-                  <span class="ln" style="left: 156px; top: 72px; width: 136px"></span>
-                  <span class="ln" style="left: 156px; top: 100px; width: 110px"></span>
-                  <span class="ln" style="left: 156px; top: 128px; width: 124px"></span>
-                  <span class="ln" style="left: 156px; top: 156px; width: 84px"></span>
-                  <span class="ln" style="top: 236px; width: 250px"></span>
-                  <span class="ln" style="top: 264px; width: 200px"></span>
-                  <div class="mrz">P&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;<br />&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                  <div class="sheen"></div>
-                </div>
-                <div class="page right">
-                  <canvas class="fill guil" width="320" height="440"></canvas>
-                  <div class="visa-h">VISA</div>
-                  <div class="foil" id="pp-foil"></div>
-                  <span class="ln" style="top: 132px; width: 262px"></span>
-                  <span class="ln" style="top: 160px; width: 214px"></span>
-                  <span class="ln" style="top: 188px; width: 240px"></span>
-                  <span class="ln" style="top: 380px; width: 150px"></span>
-                  <canvas class="fill ink" id="pp-ink" width="320" height="290" style="top: 150px"></canvas>
-                  <div class="stamp pp-stamp" id="pp-stamp">REJECTED</div>
-                  <div class="sheen"></div>
-                </div>
+          <div id="pp">
+            <div class="pp-float">
+              <div class="pp-contact"></div>
+              <div class="pp-body">
+                <div class="pp-edge"></div>
+                <img class="pp-img" src="assets/props/passport-spread.png" alt="" />
+                <img class="pp-stamp" src="assets/props/stamp-rejected.png" alt="" />
+                <div class="pp-holo"></div>
+                <div class="pp-sheen"></div>
               </div>
             </div>
           </div>
@@ -263,154 +108,19 @@
       <script>
         (function () {
           const $ = (s) => document.querySelector(s);
-          const $$ = (s) => Array.from(document.querySelectorAll(s));
-          const clamp01 = (x) => Math.min(1, Math.max(0, x));
-          const easeOut = (x) => 1 - Math.pow(1 - clamp01(x), 3);
-          // Seeded PRNG (mulberry32): every "random" detail is identical on every frame and every render.
-          function rng(seed) {
-            let a = seed >>> 0;
-            return () => {
-              a = (a + 0x6d2b79f5) | 0;
-              let t = Math.imul(a ^ (a >>> 15), 1 | a);
-              t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-              return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-            };
-          }
+          const float = $(".pp-float");
+          const sheen = $(".pp-sheen");
+          const holo = $(".pp-holo");
 
-                    // ---------- Component library ----------
-          function guilloche(cv, k0) {
-            const c = cv.getContext("2d");
-            const w = cv.width, h = cv.height;
-            c.lineWidth = 1;
-            c.strokeStyle = "rgba(27, 35, 64, 0.13)";
-            for (let k = 0; k < 16; k++) {
-              c.beginPath();
-              for (let x = 0; x <= w; x += 4) {
-                const y = h * 0.62 + Math.sin((x / w) * Math.PI * 4 + k * 0.35 + k0) * 34 + Math.sin((x / w) * Math.PI * 9 + k) * 7 + (k - 8) * 10;
-                x ? c.lineTo(x, y) : c.moveTo(x, y);
-              }
-              c.stroke();
-            }
-            const cx = w * 0.55, cy = h * 0.4;
-            for (let k = 0; k < 22; k++) {
-              c.beginPath();
-              for (let i = 0; i <= 360; i++) {
-                const th = (i / 360) * Math.PI * 2;
-                const r = w * 0.27 + Math.sin(th * 9 + k * 0.28 + k0) * w * 0.05;
-                const px = cx + Math.cos(th + k * 0.02) * r, py = cy + Math.sin(th + k * 0.02) * r;
-                i ? c.lineTo(px, py) : c.moveTo(px, py);
-              }
-              c.stroke();
-            }
-          }
-          // Worn-ink texture for rubber stamps, applied as an alpha mask.
-          function grunge(el, w, h, seed) {
-            const cv = document.createElement("canvas");
-            cv.width = w; cv.height = h;
-            const c = cv.getContext("2d");
-            c.fillStyle = "#000";
-            c.fillRect(0, 0, w, h);
-            const r = rng(seed);
-            c.globalCompositeOperation = "destination-out";
-            for (let i = 0; i < 320; i++) {
-              c.globalAlpha = 0.3 + r() * 0.7;
-              c.beginPath();
-              c.arc(r() * w, r() * h, r() * r() * 5 + 0.6, 0, Math.PI * 2);
-              c.fill();
-            }
-            for (let i = 0; i < 12; i++) {
-              c.globalAlpha = 0.3;
-              c.fillRect(r() * w, r() * h, r() * 70 + 20, 2);
-            }
-            const url = "url(" + cv.toDataURL() + ")";
-            el.style.webkitMaskImage = url;
-            el.style.maskImage = url;
-          }
-function splatter(cv, seed, cx, cy, color) {
-            const r = rng(seed), c = cv.getContext("2d"), drops = [];
-            for (let i = 0; i < 38; i++) {
-              const big = r() < 0.22;
-              drops.push({ a: r() * Math.PI * 2, d: big ? 40 + r() * 70 : 70 + r() * 130, rad: big ? 5 + r() * 8 : 1.4 + r() * 4, tail: r() < 0.45 });
-            }
-            return (p) => {
-              c.clearRect(0, 0, cv.width, cv.height);
-              if (p <= 0) return;
-              const e = easeOut(p);
-              c.fillStyle = color;
-              for (const d of drops) {
-                const x = cx + Math.cos(d.a) * d.d * e, y = cy + Math.sin(d.a) * d.d * e * 0.7;
-                c.globalAlpha = 0.85;
-                c.beginPath();
-                c.arc(x, y, d.rad * (0.35 + 0.65 * e), 0, Math.PI * 2);
-                c.fill();
-                if (d.tail) {
-                  c.globalAlpha = 0.5;
-                  c.beginPath();
-                  c.ellipse(x - Math.cos(d.a) * d.rad * 1.6, y - Math.sin(d.a) * d.rad * 1.1, d.rad * 1.7, d.rad * 0.45, d.a, 0, Math.PI * 2);
-                  c.fill();
-                }
-              }
-              c.globalAlpha = 1;
-            };
-          }
-
-          // ---------- Build ----------
-          $$("canvas.guil").forEach((cv, i) => guilloche(cv, i * 1.7));
-          grunge($("#pp-stamp"), 266, 96, 11);
-          const drawInk = splatter($("#pp-ink"), 7, 160, 148, "#ff2e3f");
-          const g = document.querySelector(".fxc").getContext("2d");
-          const BURSTS = [{ at: 0.96, x: 680, y: 1080, spark: "#e6f54a", seed: 3 }];
-          function drawBursts(t) {
-            g.clearRect(0, 0, 1080, 1920);
-            for (const b of BURSTS) {
-              const p = (t - b.at) / 0.42;
-              if (p < 0 || p > 1) continue;
-              const e = easeOut(p), r = rng(b.seed);
-              g.globalAlpha = 1 - p;
-              g.strokeStyle = "#fbfbf6";
-              g.lineWidth = 12 * (1 - p) + 1;
-              g.beginPath();
-              g.arc(b.x, b.y, 50 + e * 320, 0, Math.PI * 2);
-              g.stroke();
-              g.lineCap = "round";
-              for (let i = 0; i < 18; i++) {
-                const a = (i / 18) * Math.PI * 2 + r() * 0.3;
-                const d0 = 70 + e * 250 * (0.7 + r() * 0.6), len = 46 * (1 - p) + 6;
-                g.strokeStyle = i % 3 ? "#ff2e3f" : b.spark;
-                g.lineWidth = 6 * (1 - p) + 1;
-                g.beginPath();
-                g.moveTo(b.x + Math.cos(a) * d0, b.y + Math.sin(a) * d0);
-                g.lineTo(b.x + Math.cos(a) * (d0 + len), b.y + Math.sin(a) * (d0 + len));
-                g.stroke();
-              }
-            }
-            g.globalAlpha = 1;
-          }
-
-          
-          const FLOATS = [{ el: $("#pp .floater"), sheens: $$("#pp .sheen"), base: [14, -6, -2], amp: [10, 4, 7, 1.5], f: 0.55, ph: 0 }];
-          function applyFloat(o, t) {
-            const w = 2 * Math.PI * o.f;
-            const y = o.amp[0] * Math.sin(w * t + o.ph);
-            const rx = o.base[0] + o.amp[1] * Math.sin(w * 0.8 * t + o.ph + 1);
-            const sy = Math.sin(w * 0.63 * t + o.ph + 2);
-            const ry = o.base[1] + o.amp[2] * sy;
-            const rz = o.base[2] + o.amp[3] * Math.sin(w * 0.47 * t + o.ph);
-            o.el.style.transform = "translate3d(0," + y.toFixed(2) + "px,0) rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg) rotateZ(" + rz.toFixed(2) + "deg)";
-            o.sheens.forEach((s) => {
-              s.style.opacity = (0.22 + 0.2 * sy).toFixed(3);
-              s.style.backgroundPosition = (50 + ry * 5).toFixed(1) + "% 50%";
-            });
-          }
-
-          const foil = $("#pp-foil");
-          const HALO = $("#pp-halo .halo.a");
+          // Slow, low-amplitude hand-held drift; the sheen and hologram follow the tilt.
           function render(t) {
-            HALO.style.opacity = (0.75 + 0.25 * Math.sin(t * 3.1)).toFixed(3);
-            FLOATS.forEach((o) => applyFloat(o, t));
-            foil.style.background = "conic-gradient(from " + ((t * 160) % 360).toFixed(1) + "deg, #e6f54a, #fbfbf6, #c9cbd3, #fbfbf6, #e6f54a)";
-            drawInk(clamp01((t - 0.96) / 0.22));
-            drawBursts(t);
+            const ry = 4 * Math.sin(t * 2.1 + 0.4);
+            const rx = 9 + 2.5 * Math.sin(t * 1.7 + 1.1);
+            const y = 5 * Math.sin(t * 2.6);
+            float.style.transform = "translate3d(0," + y.toFixed(2) + "px,0) rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg) rotateZ(-1.5deg)";
+            sheen.style.backgroundPosition = (60 - ry * 9).toFixed(1) + "% 50%";
+            sheen.style.opacity = (0.55 + 0.25 * Math.sin(t * 2.1 + 0.4)).toFixed(3);
+            holo.style.background = "conic-gradient(from " + (ry * 22).toFixed(1) + "deg, rgba(255,255,255,0.7), rgba(255,255,255,0) 30%, rgba(255,255,255,0.5) 55%, rgba(255,255,255,0) 80%, rgba(255,255,255,0.7))";
           }
 
           const tl = gsap.timeline({ paused: true });
@@ -418,20 +128,18 @@ function splatter(cv, seed, cx, cy, color) {
           tl.to(clock, { t: 1.98, duration: 1.98, ease: "none", onUpdate: () => render(clock.t) }, 0);
           render(0);
 
-          function slamStamp(sel, impactSel, land) {
-            tl.set(sel, { autoAlpha: 0, scale: 2.4, rotation: -24 }, 0);
-            tl.to(sel, { autoAlpha: 1, scale: 1, rotation: -11, duration: 0.14, ease: "power4.in" }, land - 0.14);
-            tl.to(impactSel, { scale: 0.955, z: -30, duration: 0.05, ease: "power2.out" }, land);
-            tl.to(impactSel, { scale: 1, z: 0, duration: 0.36, ease: "back.out(2.2)" }, land + 0.05);
-          }
+          tl.set("#pp", { autoAlpha: 0, y: 360, rotationX: 48, scale: 0.72 }, 0);
+          tl.to("#pp", { autoAlpha: 1, duration: 0.12, ease: "none" }, 0.02);
+          tl.to("#pp", { y: 0, rotationX: 0, scale: 0.86, duration: 0.62, ease: "expo.out" }, 0.02);
 
-          tl.set("#pp, #pp-halo", { autoAlpha: 0, y: 420, rotationX: 70, rotationZ: -8, scale: 0.55 }, 0);
-          tl.to("#pp, #pp-halo", { autoAlpha: 1, duration: 0.1, ease: "none" }, 0.02);
-          tl.to("#pp, #pp-halo", { y: 0, rotationX: 0, rotationZ: 0, scale: 0.86, duration: 0.6, ease: "expo.out" }, 0.02);
-          tl.fromTo("#pp-halo .halo.b", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1.1, duration: 0.18, ease: "power2.out" }, 0.96);
-          tl.to("#pp-halo .halo.b", { opacity: 0.55, scale: 1, duration: 0.5, ease: "power2.inOut" }, 0.96 + 0.18);
-          slamStamp("#pp-stamp", "#pp-impact", 0.96);
-          tl.to("#pp, #pp-halo", { x: 820, rotationY: 75, rotationZ: 20, duration: 0.28, ease: "power3.in" }, 1.68);
+          // Stamp: presses down onto the page; the book gives slightly under it.
+          tl.set(".pp-stamp", { autoAlpha: 0, scale: 1.3, rotation: -3 }, 0);
+          tl.to(".pp-stamp", { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.11, ease: "power3.in" }, 0.85);
+          tl.to(".pp-body", { scale: 0.985, z: -10, duration: 0.05, ease: "power2.out" }, 0.96);
+          tl.to(".pp-body", { scale: 1, z: 0, duration: 0.3, ease: "power2.out" }, 1.01);
+
+          tl.to("#pp", { x: 380, rotationY: 28, autoAlpha: 0, duration: 0.26, ease: "power2.in" }, 1.7);
+
           window.__timelines["passport"] = tl;
         })();
       </script>

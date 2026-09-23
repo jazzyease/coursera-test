@@ -6,14 +6,6 @@
   <body>
     <template>
       <style>
-
-        @font-face {
-          font-family: "Archivo";
-          src: url("assets/fonts/Archivo-Italic-Variable.woff2") format("woff2");
-          font-weight: 100 900;
-          font-stretch: 62% 125%;
-          font-style: italic;
-        }
         #root {
           position: absolute;
           inset: 0;
@@ -23,178 +15,119 @@
         .stage {
           position: absolute;
           inset: 0;
-          perspective: 1500px;
-          perspective-origin: 50% 900px;
+          perspective: 1600px;
+          perspective-origin: 50% 1000px;
         }
-        .obj,
-        .floater,
-        .impact {
-          position: absolute;
-          transform-style: preserve-3d;
-        }
-        .floater,
-        .impact {
-          inset: 0;
-        }
-        .shadow {
-          position: absolute;
-          left: -60px;
-          right: -60px;
-          top: 40px;
-          bottom: -80px;
-          background: radial-gradient(ellipse 50% 45% at 50% 55%, rgba(14, 11, 16, 0.6), rgba(14, 11, 16, 0) 72%);
-          transform: translateZ(-70px);
-        }
-        .sheen {
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          background: linear-gradient(115deg, rgba(251, 251, 246, 0) 30%, rgba(251, 251, 246, 0.85) 50%, rgba(251, 251, 246, 0) 70%);
-          background-size: 260% 100%;
-          mix-blend-mode: soft-light;
-          opacity: 0.2;
-        }
-        canvas.fill {
-          position: absolute;
-          left: 0;
-          top: 0;
-        }
-        .ln {
-          position: absolute;
-          left: 26px;
-          height: 12px;
-          border-radius: 6px;
-          background: #c9cbd3;
-        }
-        .stamp {
-          position: absolute;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 7px solid #ff2e3f;
-          border-radius: 14px;
-          box-sizing: border-box;
-          color: #ff2e3f;
-          font-family: "Archivo", sans-serif;
-          font-style: italic;
-          font-weight: 900;
-          font-stretch: 118%;
-          line-height: 1;
-          mix-blend-mode: multiply;
-          -webkit-mask-size: 100% 100%;
-          mask-size: 100% 100%;
-        }
-
-        .fxc {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 1080px;
-          height: 1920px;
-        }
-      /* ---------- Envelope ---------- */
         #env {
+          position: absolute;
           left: 320px;
-          top: 970px;
+          top: 985px;
           width: 440px;
           height: 290px;
+          transform-style: preserve-3d;
+        }
+        .env-float,
+        .env-body {
+          position: absolute;
+          inset: 0;
+          transform-style: preserve-3d;
+        }
+        .env-contact {
+          position: absolute;
+          left: 6%;
+          right: 6%;
+          top: 20%;
+          bottom: -12%;
+          border-radius: 50%;
+          background: rgba(14, 11, 16, 0.5);
+          filter: blur(30px);
+          transform: translateZ(-60px);
+        }
+        .tex {
+          background-image: url("assets/props/env-paper.png");
+          background-size: 440px 290px;
         }
         .env-back {
           position: absolute;
           inset: 0;
-          border-radius: 12px;
-          background: #d9d5cc;
-          box-shadow:
-            inset 0 2px 0 rgba(255, 255, 255, 0.7),
-            0 30px 60px rgba(14, 11, 16, 0.55);
-        }
-        .letter {
-          position: absolute;
-          left: 24px;
-          right: 24px;
-          top: 14px;
-          height: 262px;
-          border-radius: 8px;
-          background: #fbfbf6;
-          box-shadow: 0 -6px 18px rgba(14, 11, 16, 0.2);
-          overflow: hidden;
-        }
-        .env-stamp {
-          left: 40px;
-          top: 34px;
-          width: 312px;
-          height: 104px;
-          font-size: 46px;
-        }
-        .env-front {
-          position: absolute;
-          inset: 0;
-          border-radius: 12px;
-          background: linear-gradient(180deg, #e7e3da, #efebe1);
-          clip-path: polygon(0 0, 50% 56%, 100% 0, 100% 100%, 0 100%);
-          transform: translateZ(3px);
-        }
-        .env-front::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(35deg, rgba(14, 11, 16, 0.08), rgba(14, 11, 16, 0) 50%),
-            linear-gradient(-35deg, rgba(14, 11, 16, 0.08), rgba(14, 11, 16, 0) 50%);
+          border-radius: 6px;
+          filter: brightness(0.9);
+          box-shadow: 0 24px 50px rgba(14, 11, 16, 0.45);
         }
         .env-flap {
           position: absolute;
           left: 0;
           right: 0;
           top: 0;
-          height: 190px;
-          background: linear-gradient(180deg, #d9d5cc, #e7e3da);
-          clip-path: polygon(0 0, 100% 0, 50% 88%);
+          height: 180px;
+          clip-path: polygon(0 0, 100% 0, 52% 94%, 48% 94%);
           transform-origin: 50% 0%;
+          filter: brightness(0.95);
         }
-
-                /* Backlight halo behind each object; pops it off the footage */
-        #env-halo {
+        .letter {
           position: absolute;
-          left: 60px;
-          top: 730px;
-          width: 960px;
-          height: 770px;
+          left: 24px;
+          top: 14px;
+          width: 392px;
+          height: 262px;
+          border-radius: 3px;
+          box-shadow: 0 -4px 14px rgba(14, 11, 16, 0.18);
         }
-        .halo {
+        .letter img {
           position: absolute;
           inset: 0;
-          pointer-events: none;
+          width: 100%;
+          height: 100%;
+          border-radius: 3px;
         }
-        .halo.a {
-          background: radial-gradient(closest-side, rgba(230, 245, 74, 0.42), rgba(230, 245, 74, 0.12) 55%, rgba(230, 245, 74, 0));
+        .env-stamp {
+          position: absolute;
+          left: 58px;
+          top: 18px;
+          width: 280px;
+          height: 125px;
+          mix-blend-mode: multiply;
         }
-        .halo.b {
-          background: radial-gradient(closest-side, rgba(255, 46, 63, 0.6), rgba(255, 46, 63, 0.16) 55%, rgba(255, 46, 63, 0));
-          opacity: 0;
+        /* Front pocket: side + bottom panels with their seams catching light. */
+        .env-front {
+          position: absolute;
+          inset: 0;
+          border-radius: 6px;
+          clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
+        }
+        .env-front::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(32deg, rgba(14, 11, 16, 0.1), rgba(14, 11, 16, 0) 46%),
+            linear-gradient(-32deg, rgba(14, 11, 16, 0.08), rgba(14, 11, 16, 0) 46%);
+        }
+        .env-sheen {
+          position: absolute;
+          inset: 0;
+          border-radius: 6px;
+          background: linear-gradient(112deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 62%);
+          background-size: 300% 100%;
+          mix-blend-mode: soft-light;
+          clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
         }
       </style>
 
       <div id="root" data-composition-id="envelope" data-width="1080" data-height="1920">
-        <canvas class="fxc" width="1080" height="1920"></canvas>
         <div class="stage">
-          <!-- Envelope: "the rejection letter arrives" -->
-          <div class="halo-wrap" id="env-halo"><div class="halo a"></div><div class="halo b"></div></div>
-          <div class="obj" id="env">
-            <div class="floater">
-              <div class="shadow"></div>
-              <div class="impact" id="env-impact">
-                <div class="env-back"></div>
-                <div class="env-flap" id="env-flap"></div>
+          <div id="env">
+            <div class="env-float">
+              <div class="env-contact"></div>
+              <div class="env-body" id="env-body">
+                <div class="env-back tex"></div>
+                <div class="env-flap tex" id="env-flap"></div>
                 <div class="letter" id="env-letter">
-                  <span class="ln" style="top: 22px; width: 120px; background: #0e0b10"></span>
-                  <span class="ln" style="top: 160px; width: 300px"></span>
-                  <span class="ln" style="top: 186px; width: 250px"></span>
-                  <span class="ln" style="top: 212px; width: 280px"></span>
-                  <canvas class="fill ink" id="env-ink" width="392" height="262"></canvas>
-                  <div class="stamp env-stamp" id="env-stamp">REJECTED</div>
+                  <img src="assets/props/letter.png" alt="" />
+                  <img class="env-stamp" id="env-stamp" src="assets/props/stamp-rejected.png" alt="" />
                 </div>
-                <div class="env-front"></div>
-                <div class="sheen" style="border-radius: 12px; transform: translateZ(4px)"></div>
+                <div class="env-front tex"></div>
+                <div class="env-sheen" id="env-sheen"></div>
               </div>
             </div>
           </div>
@@ -203,126 +136,13 @@
 
       <script>
         (function () {
+          // Local time: this scene is mounted at 8.02s.
           const $ = (s) => document.querySelector(s);
-          const $$ = (s) => Array.from(document.querySelectorAll(s));
-          const clamp01 = (x) => Math.min(1, Math.max(0, x));
-          const easeOut = (x) => 1 - Math.pow(1 - clamp01(x), 3);
-          // Seeded PRNG (mulberry32): every "random" detail is identical on every frame and every render.
-          function rng(seed) {
-            let a = seed >>> 0;
-            return () => {
-              a = (a + 0x6d2b79f5) | 0;
-              let t = Math.imul(a ^ (a >>> 15), 1 | a);
-              t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-              return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-            };
-          }
-
-                    // Worn-ink texture for rubber stamps, applied as an alpha mask.
-          function grunge(el, w, h, seed) {
-            const cv = document.createElement("canvas");
-            cv.width = w; cv.height = h;
-            const c = cv.getContext("2d");
-            c.fillStyle = "#000";
-            c.fillRect(0, 0, w, h);
-            const r = rng(seed);
-            c.globalCompositeOperation = "destination-out";
-            for (let i = 0; i < 320; i++) {
-              c.globalAlpha = 0.3 + r() * 0.7;
-              c.beginPath();
-              c.arc(r() * w, r() * h, r() * r() * 5 + 0.6, 0, Math.PI * 2);
-              c.fill();
-            }
-            for (let i = 0; i < 12; i++) {
-              c.globalAlpha = 0.3;
-              c.fillRect(r() * w, r() * h, r() * 70 + 20, 2);
-            }
-            const url = "url(" + cv.toDataURL() + ")";
-            el.style.webkitMaskImage = url;
-            el.style.maskImage = url;
-          }
-function splatter(cv, seed, cx, cy, color) {
-            const r = rng(seed), c = cv.getContext("2d"), drops = [];
-            for (let i = 0; i < 38; i++) {
-              const big = r() < 0.22;
-              drops.push({ a: r() * Math.PI * 2, d: big ? 40 + r() * 70 : 70 + r() * 130, rad: big ? 5 + r() * 8 : 1.4 + r() * 4, tail: r() < 0.45 });
-            }
-            return (p) => {
-              c.clearRect(0, 0, cv.width, cv.height);
-              if (p <= 0) return;
-              const e = easeOut(p);
-              c.fillStyle = color;
-              for (const d of drops) {
-                const x = cx + Math.cos(d.a) * d.d * e, y = cy + Math.sin(d.a) * d.d * e * 0.7;
-                c.globalAlpha = 0.85;
-                c.beginPath();
-                c.arc(x, y, d.rad * (0.35 + 0.65 * e), 0, Math.PI * 2);
-                c.fill();
-                if (d.tail) {
-                  c.globalAlpha = 0.5;
-                  c.beginPath();
-                  c.ellipse(x - Math.cos(d.a) * d.rad * 1.6, y - Math.sin(d.a) * d.rad * 1.1, d.rad * 1.7, d.rad * 0.45, d.a, 0, Math.PI * 2);
-                  c.fill();
-                }
-              }
-              c.globalAlpha = 1;
-            };
-          }
-
-          // ---------- Build ----------
-          grunge($("#env-stamp"), 312, 104, 23);
-          const drawInk = splatter($("#env-ink"), 19, 196, 86, "#ff2e3f");
-          const g = document.querySelector(".fxc").getContext("2d");
-          const BURSTS = [{ at: 1.03, x: 540, y: 950, spark: "#fbfbf6", seed: 15 }];
-          function drawBursts(t) {
-            g.clearRect(0, 0, 1080, 1920);
-            for (const b of BURSTS) {
-              const p = (t - b.at) / 0.42;
-              if (p < 0 || p > 1) continue;
-              const e = easeOut(p), r = rng(b.seed);
-              g.globalAlpha = 1 - p;
-              g.strokeStyle = "#fbfbf6";
-              g.lineWidth = 12 * (1 - p) + 1;
-              g.beginPath();
-              g.arc(b.x, b.y, 50 + e * 320, 0, Math.PI * 2);
-              g.stroke();
-              g.lineCap = "round";
-              for (let i = 0; i < 18; i++) {
-                const a = (i / 18) * Math.PI * 2 + r() * 0.3;
-                const d0 = 70 + e * 250 * (0.7 + r() * 0.6), len = 46 * (1 - p) + 6;
-                g.strokeStyle = i % 3 ? "#ff2e3f" : b.spark;
-                g.lineWidth = 6 * (1 - p) + 1;
-                g.beginPath();
-                g.moveTo(b.x + Math.cos(a) * d0, b.y + Math.sin(a) * d0);
-                g.lineTo(b.x + Math.cos(a) * (d0 + len), b.y + Math.sin(a) * (d0 + len));
-                g.stroke();
-              }
-            }
-            g.globalAlpha = 1;
-          }
-
-          
-          const FLOATS = [{ el: $("#env .floater"), sheens: $$("#env .sheen"), base: [10, 4, -1.5], amp: [8, 3, 6, 1], f: 0.5, ph: 2.1 }];
-          function applyFloat(o, t) {
-            const w = 2 * Math.PI * o.f;
-            const y = o.amp[0] * Math.sin(w * t + o.ph);
-            const rx = o.base[0] + o.amp[1] * Math.sin(w * 0.8 * t + o.ph + 1);
-            const sy = Math.sin(w * 0.63 * t + o.ph + 2);
-            const ry = o.base[1] + o.amp[2] * sy;
-            const rz = o.base[2] + o.amp[3] * Math.sin(w * 0.47 * t + o.ph);
-            o.el.style.transform = "translate3d(0," + y.toFixed(2) + "px,0) rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg) rotateZ(" + rz.toFixed(2) + "deg)";
-            o.sheens.forEach((s) => {
-              s.style.opacity = (0.22 + 0.2 * sy).toFixed(3);
-              s.style.backgroundPosition = (50 + ry * 5).toFixed(1) + "% 50%";
-            });
-          }
-
-          const HALO = $("#env-halo .halo.a");
+          const float = $(".env-float"), sheen = $("#env-sheen");
           function render(t) {
-            HALO.style.opacity = (0.75 + 0.25 * Math.sin(t * 3.1)).toFixed(3);
-            FLOATS.forEach((o) => applyFloat(o, t));
-            drawInk(clamp01((t - 1.03) / 0.22));
-            drawBursts(t);
+            const ry = 3.5 * Math.sin(t * 1.9 + 2.1);
+            float.style.transform = "translate3d(0," + (5 * Math.sin(t * 2.3 + 2)).toFixed(2) + "px,0) rotateX(" + (8 + 2 * Math.sin(t * 1.5)).toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg) rotateZ(-1deg)";
+            sheen.style.backgroundPosition = (60 - ry * 10).toFixed(1) + "% 50%";
           }
 
           const tl = gsap.timeline({ paused: true });
@@ -330,24 +150,19 @@ function splatter(cv, seed, cx, cy, color) {
           tl.to(clock, { t: 2.1, duration: 2.1, ease: "none", onUpdate: () => render(clock.t) }, 0);
           render(0);
 
-          function slamStamp(sel, impactSel, land) {
-            tl.set(sel, { autoAlpha: 0, scale: 2.4, rotation: -24 }, 0);
-            tl.to(sel, { autoAlpha: 1, scale: 1, rotation: -11, duration: 0.14, ease: "power4.in" }, land - 0.14);
-            tl.to(impactSel, { scale: 0.955, z: -30, duration: 0.05, ease: "power2.out" }, land);
-            tl.to(impactSel, { scale: 1, z: 0, duration: 0.36, ease: "back.out(2.2)" }, land + 0.05);
-          }
-
-          // Local time: this scene is mounted at 8.02s.
-          tl.set("#env, #env-halo", { autoAlpha: 0, x: 520, y: 900, rotation: 38, rotationY: -55 }, 0);
-          tl.to("#env, #env-halo", { autoAlpha: 1, duration: 0.06, ease: "none" }, 0.02);
-          tl.to("#env, #env-halo", { x: 0, y: 0, rotation: 0, rotationY: 0, scale: 0.9, duration: 0.42, ease: "expo.out" }, 0.02);
+          tl.set("#env", { autoAlpha: 0, x: 360, y: 520, rotation: 14, rotationY: -24, scale: 0.9 }, 0);
+          tl.to("#env", { autoAlpha: 1, duration: 0.08, ease: "none" }, 0.02);
+          tl.to("#env", { x: 0, y: 0, rotation: 0, rotationY: 0, duration: 0.5, ease: "expo.out" }, 0.02);
           tl.set("#env-flap", { rotationX: 0, z: 4 }, 0);
-          tl.to("#env-flap", { rotationX: 180, z: -3, duration: 0.24, ease: "power2.inOut" }, 0.4);
+          tl.to("#env-flap", { rotationX: 180, z: -3, duration: 0.3, ease: "power2.inOut" }, 0.4);
           tl.set("#env-letter", { y: 0, z: 2 }, 0);
-          tl.to("#env-letter", { y: -150, duration: 0.34, ease: "power3.out" }, 0.54);
-          tl.fromTo("#env-halo .halo.b", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1.1, duration: 0.18, ease: "power2.out" }, 1.03);
-          tl.to("#env-halo .halo.b", { opacity: 0.55, scale: 1, duration: 0.5, ease: "power2.inOut" }, 1.03 + 0.18);
-          slamStamp("#env-stamp", "#env-impact", 1.03);
+          tl.to("#env-letter", { y: -150, duration: 0.4, ease: "power3.out" }, 0.56);
+
+          tl.set("#env-stamp", { autoAlpha: 0, scale: 1.3, rotation: -3 }, 0);
+          tl.to("#env-stamp", { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.11, ease: "power3.in" }, 0.92);
+          tl.to("#env-body", { scale: 0.985, z: -10, duration: 0.05, ease: "power2.out" }, 1.03);
+          tl.to("#env-body", { scale: 1, z: 0, duration: 0.3, ease: "power2.out" }, 1.08);
+
           window.__timelines["envelope"] = tl;
         })();
       </script>
