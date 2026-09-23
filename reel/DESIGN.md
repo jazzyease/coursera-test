@@ -18,7 +18,8 @@ typewriter-mono labels. Restrained, warm, no neon, no gradients.
 ## Type
 
 - **Archivo** (variable, local woff2) — captions & labels. Captions 800 weight, width 108%,
-  sentence case, tracking -0.02em. Stamp text 900, width 125%, uppercase, +0.08em.
+  sentence case, tracking -0.02em. Caption stamp 900, width 125%, uppercase, +0.06em.
+  The small stamp on the paper card uses bundled **Archivo Black** (same design, fixed cut).
 - **Instrument Serif Italic** (local woff2) — emphasis words only ("document", "why",
   "rejection letter"). Mixed into caption lines at ~1.3× size. This serif/sans tension is the
   voice shift from statement → consequence.
@@ -52,4 +53,5 @@ typewriter-mono labels. Restrained, warm, no neon, no gradients.
 
 - No gradient text, no neon, no pure #000/#fff, no emoji, no extra claims or CTA text
   beyond the spoken dialogue.
-- No more than one moving graphic besides captions at any moment.
+- No more than one moving graphic besides captions at any moment (the header's ambient
+  voice meter excepted).

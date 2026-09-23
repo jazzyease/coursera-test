@@ -92,21 +92,21 @@
       </style>
 
       <div data-hf-id="hf-bxdw" id="root" data-composition-id="paper-card" data-width="340" data-height="440">
-        <div data-hf-id="hf-px16" class="pc-card" id="pc-card">
+        <div data-hf-id="hf-px16" class="pc-card">
           <div data-hf-id="hf-85aq" class="pc-head"><span data-hf-id="hf-1fsw" class="pc-dot"></span><span data-hf-id="hf-3fyi" class="pc-label">DOCUMENT</span></div>
-          <span data-hf-id="hf-f69v" class="pc-rule" id="pc-rule"></span>
-          <div data-hf-id="hf-xcru" class="pc-lines" id="pc-lines">
+          <span data-hf-id="hf-f69v" class="pc-rule"></span>
+          <div data-hf-id="hf-xcru" class="pc-lines">
             <span data-hf-id="hf-b9nb" class="pc-line" style="width: 92%"></span>
             <span data-hf-id="hf-rv93" class="pc-line" style="width: 78%"></span>
             <span data-hf-id="hf-58vb" class="pc-line pc-key" style="width: 86%"></span>
             <span data-hf-id="hf-c1q2" class="pc-line" style="width: 64%"></span>
             <span data-hf-id="hf-jv3s" class="pc-line" style="width: 88%"></span>
             <span data-hf-id="hf-ec6r" class="pc-line" style="width: 52%"></span>
-            <svg data-hf-id="hf-cjx9" class="pc-ring" id="pc-ring" viewBox="0 0 250 70" aria-hidden="true">
-              <path data-hf-id="hf-8vkk" id="pc-ring-path" d="M18,38 C20,14 90,6 150,8 C212,10 244,22 238,40 C232,60 160,66 100,64 C44,62 10,54 14,34 C16,24 30,18 44,16" fill="none" stroke="#b8392a" stroke-width="5" stroke-linecap="round" />
+            <svg data-hf-id="hf-cjx9" class="pc-ring" viewBox="0 0 250 70" aria-hidden="true">
+              <path data-hf-id="hf-8vkk" class="pc-ring-path" d="M18,38 C20,14 90,6 150,8 C212,10 244,22 238,40 C232,60 160,66 100,64 C44,62 10,54 14,34 C16,24 30,18 44,16" fill="none" stroke="#b8392a" stroke-width="5" stroke-linecap="round" />
             </svg>
           </div>
-          <div data-hf-id="hf-ir7c" class="pc-stamp" id="pc-stamp">REJECTED</div>
+          <div data-hf-id="hf-ir7c" class="pc-stamp">REJECTED</div>
         </div>
       </div>
 
@@ -119,41 +119,41 @@
           const tl = gsap.timeline({ paused: true });
 
           tl.fromTo(
-            "#pc-card",
+            ".pc-card",
             fromBottom
               ? { y: 560, x: 0, rotation: tilt - 10, opacity: 1 }
               : { x: 380, y: 30, rotation: tilt + 14, opacity: 0 },
             { x: 0, y: 0, rotation: tilt, opacity: 1, duration: 0.62, ease: "expo.out" },
             0,
           );
-          tl.fromTo("#pc-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power3.out" }, 0.18);
+          tl.fromTo(".pc-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power3.out" }, 0.18);
           tl.fromTo(
-            "#pc-lines .pc-line",
+            ".pc-lines .pc-line",
             { scaleX: 0 },
             { scaleX: 1, duration: 0.36, ease: "power2.out", stagger: 0.045 },
             0.24,
           );
 
-          // Ring path is ~560 units long; dash draw keeps it seek-safe.
-          const ring = document.getElementById("pc-ring-path");
+          // Classes, not ids: this component is mounted more than once. Dash draw keeps the ring seek-safe.
+          const ring = document.querySelector(".pc-ring-path");
           const len = ring.getTotalLength();
           tl.set(ring, { strokeDasharray: len, strokeDashoffset: len }, 0);
           if (Number(v.ringAt) >= 0) {
             tl.to(ring, { strokeDashoffset: 0, duration: 0.42, ease: "power2.inOut" }, Number(v.ringAt));
-            tl.to("#pc-lines .pc-key", { backgroundColor: "rgba(184,57,42,0.55)", duration: 0.2 }, Number(v.ringAt) + 0.25);
+            tl.to(".pc-lines .pc-key", { backgroundColor: "rgba(184,57,42,0.55)", duration: 0.2 }, Number(v.ringAt) + 0.25);
           }
 
           if (Number(v.stampAt) >= 0) {
             const s = Number(v.stampAt);
             tl.fromTo(
-              "#pc-stamp",
+              ".pc-stamp",
               { scale: 1.9, rotation: -16, opacity: 0 },
               { scale: 1, rotation: -9, opacity: 1, duration: 0.14, ease: "power4.in" },
               s,
             );
             // Impact: the sheet dips as the stamp lands.
-            tl.to("#pc-card", { scale: 0.975, duration: 0.05, ease: "power2.out" }, s + 0.14);
-            tl.to("#pc-card", { scale: 1, duration: 0.3, ease: "power3.out" }, s + 0.19);
+            tl.to(".pc-card", { scale: 0.975, duration: 0.05, ease: "power2.out" }, s + 0.14);
+            tl.to(".pc-card", { scale: 1, duration: 0.3, ease: "power3.out" }, s + 0.19);
           }
 
           window.__timelines["paper-card"] = tl;
