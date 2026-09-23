@@ -31,4 +31,9 @@ ffmpeg -loglevel error -y -c:v libvpx-vp9 -i "$CUT" -ss 24.88 -t 1.48 \
   -c:v libvpx-vp9 -pix_fmt yuva420p -crf 18 -b:v 0 -auto-alt-ref 0 assets/media/cutout-redflag.webm
 # Freeze frame for the end hold (last source frame, from the treated plate).
 ffmpeg -loglevel error -y -sseof -0.08 -i assets/media/plate.mp4 -frames:v 1 -q:v 2 assets/media/end-hold.jpg
-echo "plate, red-flag cutout and end-hold frame written"
+# Blurred plates for full scenes (colour, and B&W for the hook's black-and-white stretch).
+ffmpeg -loglevel error -y -i assets/media/plate.mp4 -an -vf "scale=540:960,gblur=sigma=18,eq=brightness=-0.03:saturation=0.92" \
+  -c:v libx264 -crf 20 -preset medium -g 25 -pix_fmt yuv420p assets/media/blur-full.mp4
+ffmpeg -loglevel error -y -i assets/media/plate.mp4 -t 10.12 -an -vf "scale=540:960,gblur=sigma=18,hue=s=0,eq=brightness=-0.05:contrast=1.08" \
+  -c:v libx264 -crf 20 -preset medium -g 25 -pix_fmt yuv420p assets/media/blur-bw.mp4
+echo "plate, red-flag cutout, end-hold frame and blur plates written"

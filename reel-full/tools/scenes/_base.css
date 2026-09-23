@@ -1,0 +1,77 @@
+        @font-face {
+          font-family: "Archivo";
+          src: url("assets/fonts/Archivo-Variable.woff2") format("woff2");
+          font-weight: 100 900;
+          font-stretch: 62% 125%;
+          font-style: normal;
+        }
+        @font-face {
+          font-family: "Archivo";
+          src: url("assets/fonts/Archivo-Italic-Variable.woff2") format("woff2");
+          font-weight: 100 900;
+          font-stretch: 62% 125%;
+          font-style: italic;
+        }
+        #root {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+          font-family: "Archivo", sans-serif;
+        }
+        /* Icon slot: built-in line icon, or assets/custom/<name>.png when supplied (ASSET_PROMPTS.md). */
+        .slot {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: none;
+        }
+        .slot svg {
+          width: 58%;
+          height: 58%;
+        }
+        .slot .slot-img {
+          position: absolute;
+          left: -16%;
+          top: -16%;
+          width: 132%;
+          height: 132%;
+          object-fit: contain;
+        }
+        .slot.has-img {
+          background: transparent !important;
+          box-shadow: none !important;
+        }
+        .card-light {
+          background: linear-gradient(180deg, #ffffff, #f1f0ea);
+          box-shadow:
+            inset 0 1px 0 #ffffff,
+            inset 0 -2px 0 rgba(14, 11, 16, 0.06),
+            0 26px 52px rgba(14, 11, 16, 0.45),
+            0 4px 10px rgba(14, 11, 16, 0.25);
+        }
+        .glass-dark {
+          background: rgba(22, 19, 27, 0.84);
+          box-shadow:
+            inset 0 0 0 2px rgba(251, 251, 246, 0.12),
+            inset 0 2px 0 rgba(251, 251, 246, 0.1),
+            0 26px 56px rgba(14, 11, 16, 0.55);
+        }
+        /* One soft light pass across a surface after it lands. */
+        .shine {
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          overflow: hidden;
+        }
+        .shine::before {
+          content: "";
+          position: absolute;
+          top: -20%;
+          bottom: -20%;
+          left: 0;
+          width: 38%;
+          background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+          transform: translateX(var(--sx, -140%)) skewX(-12deg);
+        }

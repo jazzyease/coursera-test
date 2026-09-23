@@ -71,12 +71,24 @@ GROUPS = [
     G([116, 117, 118], [[119], [120]], "white", 116),
     G([], [[121, 122], [123, 124]], "red", 132, hero=[124]),
 ]
-for i, g in enumerate(GROUPS):
+for g in GROUPS:
     if "start0" in g:
         g["start"] = g.pop("start0")
-    nxt = GROUPS[i + 1]["start"] if i + 1 < len(GROUPS) else 99
-    g["end"] = nxt
-GROUPS[-1]["end"] = 60  # holds through the end freeze
+
+# Scenes that carry their own words replace these caption groups:
+#   6 "It's called your statement of purpose" -> sop-title
+#   10-13 "A weak SOP has generic goals, copied lines, zero personal story" -> slabs-weak
+#   28-30 "Work Abroad Consultancy is doing free SOP reviews this month" -> brand
+DROP = {6, 10, 11, 12, 13, 28, 29, 30}
+SUPPRESS = [(9.56, 12.5), (16.64, 21.8), (41.1, 44.76)]  # source windows with no captions
+GROUPS = [g for i, g in enumerate(GROUPS) if i not in DROP]
+for g in GROUPS:
+    for a, b in SUPPRESS:
+        if a <= g["start"] < b:
+            g["start"] = b
+for i, g in enumerate(GROUPS):
+    nxt = GROUPS[i + 1]["start"] if i + 1 < len(GROUPS) else 60  # last group holds through the end freeze
+    g["end"] = min([nxt] + [a for a, _ in SUPPRESS if a > g["start"]])
 # hold through the hook's blur pause (source 4.44-5.12) exactly as in the 10s cut
 GROUPS[2]["end"] = 4.44
 
@@ -150,32 +162,54 @@ MOMENTS = """
 # (id, composition, source start, source end, variables). Each window sits inside one segment,
 # so the variables' local times are simply (source time - source start).
 HOSTS = [
-    ("passport", "passport.html", 0.0, 1.98, None),
-    ("doc-stack", "doc-stack.html", 1.96, 4.56, None),
-    ("envelope", "envelope.html", 8.02, 9.62, None),
-    ("sop-intro", "sop-intro.html", 9.5, 14.6, dict(mode="intro", inAt=0.06, outAt=4.86, dur=5.1)),
-    ("sop-weak", "sop-weak.html", 16.64, 21.8, dict(mode="weak", inAt=0.18, a=17.98 - 16.64, b=19.22 - 16.64, c=20.48 - 16.64, dur=5.16)),
-    ("sop-copies", "sop-copies.html", 22.24, 24.6, dict(mode="copies", a=23.5 - 22.24, outAt=2.1, dur=2.36)),
-    ("sop-strong", "sop-strong.html", 26.88, 29.24, dict(mode="strong", inAt=0.06, a=0.52, outAt=2.1, dur=2.36)),
+    # (host id, template or fixed composition, source start, source end, CFG in LOCAL seconds)
+    ("visa-status", "scenes/visa-status.html", 0.0, 1.98, dict(inAt=0.02, flip=0.94, outAt=1.7)),
+    ("doc-pick", "scenes/doc-pick.html", 1.96, 4.5, dict(inAt=0.1, pick=0.38, ring=0.68, why=2.08, outAt=2.36)),
+    ("letter", "scenes/letter.html", 8.02, 9.56, dict(inAt=0.02, land=0.3, outAt=1.3)),
+    ("sop-title", "scenes/sop-title.html", 9.5, 12.6, dict(l0=[0.08, 0.74, 1.0], words=[1.16, 1.58, 1.82], collapse=2.05, outAt=2.86)),
+    ("slabs-weak", "scenes/slabs.html", 16.64, 21.8, dict(
+        headerTop=596, top=736, step=172, h=150,
+        header=[dict(text="A", at=0.12), dict(text="WEAK SOP", at=0.26, pill=True), dict(text="HAS", at=0.94)],
+        slabs=[dict(text="Generic goals", at=1.34, x=2.1, slot="icon-goals"),
+               dict(text="Copied lines", at=2.58, x=3.26, slot="icon-copy"),
+               dict(text="Zero personal story", at=3.84, x=4.7, slot="icon-story")])),
+    ("hundred", "scenes/hundred.html", 22.24, 24.6, dict(inAt=0.1, fill=1.26)),
+    ("slabs-strong", "scenes/slabs.html", 28.2, 29.24, dict(
+        headerTop=0, top=690, step=138, h=118, header=[],
+        slabs=[dict(num=1, at=0.18), dict(num=2, at=0.3), dict(num=3, at=0.42)])),
     ("past-future", "past-future.html", 33.36, 37.66, dict(pastAt=0.8, futureAt=1.6, lineAt=2.42, outAt=4.04, dur=4.3)),
-    ("brand", "brand.html", 41.1, 44.76, dict(offerAt=42.84 - 41.1, outAt=3.4)),
+    ("brand", "scenes/brand.html", 41.1, 44.76, dict(inAt=0.02, name=[0.1, 0.52], offer=1.74, when=2.88)),
     ("dm", "dm.html", 45.24, 48.16, dict(typeAt=45.72 - 45.24, sendAt=46.3 - 45.24, linkAt=47.3 - 45.24, outAt=2.66)),
+]
+
+# Blurred footage behind full scenes (source windows). bw = the hook's black-and-white stretch.
+SCENE_BG = [
+    ("letter", "blur-bw", 8.02, 9.56),
+    ("sop-title", "blur-full", 9.56, 12.5),
+    ("slabs-weak", "blur-full", 16.64, 21.8),
+    ("hundred", "blur-full", 22.24, 24.6),
+    ("slabs-strong", "blur-full", 28.2, 29.24),
+    ("brand", "blur-full", 41.1, 44.76),
 ]
 
 # --------------------------------------------------------------------------- SFX (source s)
 SFX = [
-    ("pp-in", "whoosh-short", 0.02, 0.3), ("rejected", "impact-bass-1", 0.94, 0.32),
-    ("fan", "whoosh", 1.96, 0.26), ("badge1", "pop", 2.3, 0.3), ("doc", "whoosh-short", 2.3, 0.34),
-    ("why", "click", 4.02, 0.4), ("blur", "whoosh", 4.36, 0.3), ("cut", "click", 5.12, 0.3),
-    ("bw", "impact-bass-1", 7.52, 0.2), ("letter", "whoosh-short", 8.04, 0.34), ("flap", "click-soft", 8.44, 0.5),
-    ("stamp", "impact-bass-1", 9.02, 0.36), ("sop-in", "whoosh-short", 9.54, 0.26),
-    ("denied", "impact-bass-1", 15.5, 0.2), ("weak-in", "whoosh-short", 16.8, 0.22),
-    ("mark1", "click-soft", 17.98, 0.4), ("mark2", "click-soft", 19.22, 0.4), ("mark3", "click-soft", 20.48, 0.4),
-    ("copies", "whoosh", 23.48, 0.24), ("redflag", "impact-bass-1", 25.44, 0.26),
-    ("strong-in", "whoosh-short", 26.92, 0.22), ("tick", "pop", 27.4, 0.2),
+    ("vs-in", "whoosh-short", 0.02, 0.28), ("rejected", "impact-bass-1", 0.94, 0.32),
+    ("docs-in", "whoosh", 2.04, 0.22), ("badge1", "pop", 2.3, 0.28), ("pick", "click-soft", 2.36, 0.45),
+    ("why", "pop", 4.04, 0.26), ("blur", "whoosh", 4.36, 0.3), ("cut", "click", 5.12, 0.3),
+    ("bw", "impact-bass-1", 7.52, 0.2), ("notif", "whoosh-short", 8.04, 0.3), ("buzz", "click", 8.32, 0.34),
+    ("sop-in", "whoosh-short", 9.56, 0.22), ("sop-collapse", "whoosh", 11.55, 0.26), ("sop-ul", "click-soft", 12.05, 0.45),
+    ("denied", "impact-bass-1", 15.5, 0.2),
+    ("weak-pill", "pop", 16.9, 0.24),
+    ("slab1", "whoosh-short", 17.98, 0.2), ("x1", "click", 18.74, 0.32),
+    ("slab2", "whoosh-short", 19.22, 0.2), ("x2", "click", 19.9, 0.32),
+    ("slab3", "whoosh-short", 20.48, 0.2), ("x3", "click", 21.34, 0.32),
+    ("hero-doc", "click-soft", 22.34, 0.4), ("fill", "whoosh", 23.46, 0.26), ("count", "pop", 24.0, 0.2),
+    ("redflag", "impact-bass-1", 25.44, 0.26),
+    ("strong", "pop", 28.38, 0.2),
     ("b1", "pop", 29.7, 0.22), ("b2", "pop", 30.98, 0.22), ("b3", "pop", 32.1, 0.22),
     ("node1", "click-soft", 34.16, 0.4), ("node2", "click-soft", 34.96, 0.4), ("line", "whoosh-short", 35.78, 0.18),
-    ("sixty", "click", 40.08, 0.26), ("brand-in", "whoosh-short", 41.1, 0.24),
+    ("sixty", "click", 40.08, 0.26), ("brand-in", "whoosh-short", 41.1, 0.24), ("offer", "pop", 42.84, 0.22), ("month", "click-soft", 43.98, 0.4),
     ("type", "key-press", 45.72, 0.3), ("send", "pop", 46.3, 0.26), ("link", "click-soft", 47.3, 0.45),
 ]
 SFX_DUR = {"whoosh-short": 0.57, "whoosh": 0.57, "impact-bass-1": 1.0, "pop": 0.7, "click": 0.36, "click-soft": 0.36, "key-press": 0.4}
@@ -183,6 +217,83 @@ SFX_DUR = {"whoosh-short": 0.57, "whoosh": 0.57, "impact-bass-1": 1.0, "pop": 0.
 
 def attrs(d):
     return json.dumps(d, separators=(",", ":")).replace("'", "&#39;")
+
+
+# --------------------------------------------------------------------------- scene templates
+# Built-in line icons for every custom-asset slot (ASSET_PROMPTS.md). A file at
+# assets/custom/<name>.png replaces the icon on the next build.
+_SV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">{}</svg>'
+ICONS = {
+    "passport": _SV.format('<rect x="5" y="2.5" width="14" height="19" rx="2.2"/><circle cx="12" cy="10.5" r="3.6"/><path d="M8.4 10.5h7.2M12 6.9c1.3 1 1.3 6.2 0 7.2M12 6.9c-1.3 1-1.3 6.2 0 7.2M9 17.5h6"/>'),
+    "envelope": _SV.format('<rect x="2.5" y="5" width="19" height="14" rx="2.4"/><path d="M3.2 6.4l8.8 6.6 8.8-6.6"/>'),
+    "icon-goals": _SV.format('<circle cx="11" cy="13" r="8"/><circle cx="11" cy="13" r="4.4"/><circle cx="11" cy="13" r="1.2"/><path d="M15.5 8.5L20 4M17 4h3v3"/>'),
+    "icon-copy": _SV.format('<rect x="8" y="8" width="12.5" height="12.5" rx="2.2"/><path d="M16 8V5.5A2 2 0 0 0 14 3.5H5.5a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2H8"/>'),
+    "icon-story": _SV.format('<circle cx="9" cy="8" r="3.4"/><path d="M3 20c.6-3.6 3-5.6 6-5.6s5.4 2 6 5.6"/><path d="M15.5 3.5h5a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1 1h-2.3L16.5 11V9h-1a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" stroke-dasharray="2 1.6"/>'),
+    "icon-review": _SV.format('<path d="M6 3h8l4 4v6"/><path d="M6 3a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h5"/><circle cx="16.5" cy="16.5" r="3.6"/><path d="M19.2 19.2l2.3 2.3M15 16.6l1.1 1.1 2-2.2"/>'),
+    "icon-calendar": _SV.format('<rect x="3.5" y="5" width="17" height="15.5" rx="2.4"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
+}
+DOC_FALLBACK = ""  # the tile's CSS draws the document when no custom image is supplied
+
+
+def custom(name):
+    rel = f"assets/custom/{name}.png"
+    return rel if os.path.exists(os.path.join(ROOT, rel)) else ""
+
+
+def slot_html(name):
+    src = custom(name)
+    return f'<img class="slot-img" src="{src}" alt="" />' if src else ICONS[name]
+
+
+def render_scene(hid, tpl, cfg):
+    base = open(os.path.join(ROOT, "tools", "scenes", "_base.css")).read().rstrip("\n")
+    S = open(os.path.join(ROOT, "tools", tpl)).read()
+    if "slabs" in tpl:
+        for sl in cfg["slabs"]:
+            if "slot" in sl:
+                sl["icon"], sl["hasImg"] = slot_html(sl["slot"]), "has-img" if custom(sl["slot"]) else ""
+    doc = custom("document")
+    logo = custom("logo")
+    rep = {
+        "__ID__": hid,
+        "{{BASE_CSS}}": base,
+        "{{CFG}}": json.dumps(cfg),
+        "{{DOC}}": f'<img class="slot-img" src="{doc}" alt="" />' if doc else DOC_FALLBACK,
+        "{{DOCCLS}}": "" if doc else "card-light",
+        "{{DOCJS}}": json.dumps(f'<img class="slot-img" src="{doc}" alt="" />' if doc else ""),
+        "{{LOGO}}": f'<div class="logo"><img src="{logo}" alt="" /></div>' if logo else "",
+    }
+    for name in ICONS:
+        rep["{{SLOT:%s}}" % name] = slot_html(name)
+        rep["{{HAS:%s}}" % name] = "has-img" if custom(name) else ""
+    for k, v in rep.items():
+        S = S.replace(k, v)
+    assert "{{" not in S, (tpl, S[S.index("{{"):S.index("{{") + 40])
+    open(os.path.join(ROOT, "compositions", hid + ".html"), "w").write(S)
+
+
+def scene_bg_html():
+    out_ = []
+    for hid, src, s, e in SCENE_BG:
+        out_.append(
+            f'      <div class="sbg" id="sbg-{hid}">\n'
+            f'        <video id="sbv-{hid}" class="clip" src="assets/media/{src}.mp4" muted playsinline data-start="{out(s)}" '
+            f'data-media-start="{s}" data-duration="{round(e - s, 3)}" data-track-index="5"></video>\n'
+            f'        <div class="sdim"></div>\n      </div>'
+        )
+    return "\n".join(out_)
+
+
+def scene_bg_moments():
+    lines = ["        // ---------- Full scenes: blurred footage behind the graphic ----------"]
+    starts = {round(s, 2) for _, _, s, _ in SCENE_BG}
+    ends = {round(e, 2) for _, _, _, e in SCENE_BG}
+    for hid, _, s, e in SCENE_BG:
+        fin = 0.01 if round(s, 2) in ends else 0.16  # back-to-back scenes swap without a dip
+        lines.append(f'        tl.to("#sbg-{hid}", {{ opacity: 1, duration: {fin}, ease: "power2.out" }}, o({s}));')
+        if round(e, 2) not in starts:
+            lines.append(f'        tl.to("#sbg-{hid}", {{ opacity: 0, duration: 0.12, ease: "power2.in" }}, o({e}) - 0.12);')
+    return "\n".join(lines)
 
 
 def main():
@@ -196,6 +307,9 @@ def main():
     )
     hosts = []
     for hid, comp, s, e, var in HOSTS:
+        if comp.startswith("scenes/"):
+            render_scene(hid, comp, var)
+            comp, var = hid + ".html", None
         v = f" data-variable-values='{attrs(var)}'" if var else ""
         hosts.append(
             f'      <div id="{hid}-slot" style="position: absolute; inset: 0">\n'
@@ -222,7 +336,8 @@ def main():
         "{{CUTS}}": json.dumps(CUTS),
         "{{WORDS}}": json.dumps(W),
         "{{GROUPS}}": json.dumps(GROUPS),
-        "{{MOMENTS}}": MOMENTS,
+        "{{MOMENTS}}": MOMENTS + "\n" + scene_bg_moments(),
+        "{{SCENE_BG}}": scene_bg_html(),
     }
     for k, v in rep.items():
         T = T.replace(k, v)
@@ -233,11 +348,6 @@ def main():
         assert k in C, k
         C = C.replace(k, rep[k])
     open(os.path.join(ROOT, "compositions", "captions.html"), "w").write(C)
-    # Multi-instance component: one file per host, ids matched to the host.
-    S = open(os.path.join(ROOT, "tools", "sop.template.html")).read()
-    for hid, comp, *_ in HOSTS:
-        if comp.startswith("sop-"):
-            open(os.path.join(ROOT, "compositions", comp), "w").write(S.replace("__ID__", hid))
     print("index.html written; duration", total(), "segments", len(segments()), "groups", len(GROUPS))
 
 
