@@ -8,95 +8,93 @@
     <template>
       <style>
 {{BASE_CSS}}
-        /* Stacked slabs, centre stage over the blurred frame (after the reference, luemmy21). */
-        .hdr {
+        /* Stacked white cards over the sharp footage at chest height (the user's reference frame).
+           Tight 14px gap, icon + one line of words each, as spoken. */
+        .tabp {
           position: absolute;
-          left: 0;
-          width: 1080px;
+          left: 120px;
+          height: 64px;
+          padding: 0 28px;
+          border-radius: 32px;
           display: flex;
-          justify-content: center;
           align-items: center;
-          gap: 22px;
-        }
-        .hw,
-        .hp {
-          display: inline-block;
           font-style: italic;
           font-weight: 900;
-          font-stretch: 118%;
-          font-size: 76px;
-          line-height: 1;
-          color: #fbfbf6;
-          text-shadow: 0 6px 22px rgba(14, 11, 16, 0.55);
+          font-stretch: 122%;
+          font-size: 38px;
+          letter-spacing: 0.01em;
+          color: #ffffff;
+          box-shadow: 0 12px 26px rgba(8, 6, 10, 0.4);
           opacity: 0;
         }
-        .hp {
-          padding: 10px 26px 12px;
-          border-radius: 24px;
+        .tabp.red {
           background: linear-gradient(180deg, #ff4a58, #e0162a);
-          box-shadow: 0 14px 30px rgba(224, 22, 42, 0.45);
-          text-shadow: none;
+        }
+        .tabp.navy {
+          background: #1c2442;
+          color: #f6f97f;
         }
         .slab {
           position: absolute;
           left: 120px;
           width: 840px;
-          border-radius: 32px;
           display: flex;
           align-items: center;
-          gap: 30px;
-          padding: 0 26px;
+          gap: 26px;
+          padding: 0 24px;
           box-sizing: border-box;
           opacity: 0;
         }
-        .slab .ico {
-          width: 104px;
-          height: 104px;
-          border-radius: 26px;
-          background: #ffe6e8;
-          color: #d61f31;
-        }
-        .slab .num {
-          width: 86px;
-          height: 86px;
-          border-radius: 24px;
-          background: linear-gradient(180deg, #f0fb8a, #e6f54a);
-          box-shadow: inset 0 -3px 0 rgba(14, 11, 16, 0.12);
-          display: flex;
-          align-items: center;
+        .slab.center {
           justify-content: center;
-          font-style: italic;
-          font-weight: 900;
-          font-stretch: 118%;
-          font-size: 56px;
+        }
+        .slab .ico {
+          width: 92px;
+          height: 92px;
+          border-radius: 50%;
+        }
+        .ico.red {
+          background: #ffe3e6;
+          color: #e0162a;
+        }
+        .ico.lemon {
+          background: linear-gradient(180deg, #feffc4, #f1f56a);
           color: #15121a;
-          flex: none;
+        }
+        .ico.navy {
+          background: #1c2442;
+          color: #f6f97f;
         }
         .txt {
+          position: relative;
           font-weight: 800;
-          font-size: 56px;
-          letter-spacing: -0.015em;
+          font-size: 54px;
+          letter-spacing: -0.02em;
           color: #15121a;
           white-space: nowrap;
         }
-        .skel {
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
+        .txt.big {
+          font-size: 60px;
+          color: #1c2442;
         }
-        .skel span {
-          display: block;
-          height: 18px;
-          border-radius: 9px;
-          background: #dcdbd4;
+        .strike {
+          position: absolute;
+          left: -6px;
+          right: -6px;
+          top: 54%;
+          height: 7px;
+          border-radius: 4px;
+          background: #e0162a;
+          transform-origin: left center;
+          transform: scaleX(0);
         }
         .x {
           position: absolute;
-          right: 30px;
+          right: 26px;
           top: 50%;
-          width: 78px;
-          height: 78px;
-          margin-top: -39px;
+          width: 72px;
+          height: 72px;
+          margin-top: -36px;
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -106,59 +104,50 @@
           opacity: 0;
         }
         .x svg {
-          width: 34px;
-          height: 34px;
-        }
-        .edge {
-          position: absolute;
-          inset: 0;
-          border-radius: 32px;
-          box-shadow: inset 0 0 0 3px rgba(255, 46, 63, 0.85);
-          opacity: 0;
+          width: 32px;
+          height: 32px;
         }
       </style>
 
       <div id="root" data-composition-id="__ID__" data-width="1080" data-height="1920">
-        <div class="hdr" id="hdr"></div>
         <div id="slabs"></div>
       </div>
 
       <script>
         (function () {
           const C = {{CFG}};
-          const hdr = document.getElementById("hdr"), host = document.getElementById("slabs");
-          hdr.style.top = C.headerTop + "px";
+          const host = document.getElementById("slabs");
           const tl = gsap.timeline({ paused: true });
 
-          C.header.forEach((h, i) => {
-            const el = document.createElement("span");
-            el.className = h.pill ? "hp" : "hw";
-            el.id = "h" + i;
-            el.textContent = h.text;
-            hdr.appendChild(el);
-            tl.fromTo(el, { opacity: 0, y: 24, scale: h.pill ? 0.9 : 1 }, { opacity: 1, y: 0, scale: 1, duration: 0.28, ease: "power3.out" }, h.at);
-          });
-
+          if (C.tab) {
+            const t = document.createElement("div");
+            t.className = "tabp " + C.tab.tone;
+            t.id = "tab";
+            t.textContent = C.tab.text;
+            t.style.top = C.top - 64 - 16 + "px";
+            host.appendChild(t);
+            tl.fromTo(t, { opacity: 0, y: 20, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "back.out(1.8)" }, C.tab.at);
+          }
           C.slabs.forEach((s, i) => {
             const el = document.createElement("div");
-            el.className = "slab card-light";
+            el.className = "slab wcard" + (s.icon ? "" : " center");
             el.id = "s" + i;
-            el.style.top = C.top + i * C.step + "px";
+            el.style.top = C.top + i * (C.h + C.gap) + "px";
             el.style.height = C.h + "px";
-            const lead = s.num ? '<div class="num">' + s.num + "</div>" : '<div class="slot ico ' + s.hasImg + '">' + s.icon + "</div>";
-            const body = s.text ? '<div class="txt">' + s.text + "</div>" : '<div class="skel"><span style="width: 470px"></span><span style="width: 300px"></span></div>';
-            const x = s.x != null ? '<div class="x" id="x' + i + '"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div><div class="edge" id="e' + i + '"></div>' : "";
-            el.innerHTML = lead + body + x + '<div class="shine" id="sh' + i + '"></div>';
+            const lead = s.icon ? '<div class="slot ico ' + s.tone + " " + s.hasImg + '">' + s.icon + "</div>" : "";
+            const x = s.x != null ? '<div class="x" id="x' + i + '"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div>' : "";
+            el.innerHTML = lead + '<div class="txt' + (s.big ? " big" : "") + '">' + s.text + (s.x != null ? '<span class="strike" id="k' + i + '"></span>' : "") + "</div>" + x + '<div class="shine" id="sh' + i + '"></div>';
             host.appendChild(el);
 
-            tl.fromTo(el, { opacity: 0, y: 80, rotationX: -42, transformPerspective: 1000, transformOrigin: "50% 0%" }, { opacity: 1, y: 0, rotationX: 0, duration: 0.55, ease: "expo.out" }, s.at);
-            tl.fromTo("#sh" + i, { "--sx": "-140%" }, { "--sx": "360%", duration: 0.7, ease: "power2.inOut" }, s.at + 0.2);
+            tl.fromTo(el, { opacity: 0, y: 36, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.36, ease: "back.out(1.5)" }, s.at);
+            tl.fromTo("#sh" + i, { "--sx": "-140%" }, { "--sx": "360%", duration: 0.6, ease: "power2.inOut" }, s.at + 0.16);
             if (s.x != null) {
-              tl.fromTo("#x" + i, { opacity: 0, scale: 0, rotation: -90 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.34, ease: "back.out(2.2)" }, s.x);
-              tl.fromTo("#e" + i, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, s.x);
-              tl.to(el, { keyframes: [{ x: 7 }, { x: -6 }, { x: 3 }, { x: 0 }], duration: 0.2, ease: "none" }, s.x + 0.06);
+              tl.to("#k" + i, { scaleX: 1, duration: 0.26, ease: "power2.inOut" }, s.x);
+              tl.to("#s" + i + " .txt", { color: "#9a9ca6", duration: 0.2 }, s.x + 0.1);
+              tl.fromTo("#x" + i, { opacity: 0, scale: 0, rotation: -90 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.3, ease: "back.out(2.2)" }, s.x + 0.12);
             }
           });
+          if (C.outAt != null) tl.to("#slabs", { opacity: 0, y: 24, duration: 0.18, ease: "power2.in" }, C.outAt);
           window.__timelines["__ID__"] = tl;
         })();
       </script>

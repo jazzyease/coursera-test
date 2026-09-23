@@ -3,35 +3,38 @@
 Extends the approved 10s cut in `../reel/` (its DESIGN.md is the base spec: palette, caption
 finish, "no AI slop" rules). The first 9.5s here are the same hook, frame for frame.
 
-## Scene system (v2: "motion graphics take centre stage")
+## Scene system (v3: matched to the reference reels)
 
-The user rejected the pasted-on paper props ("cheap overlay") and asked for scenes at the level
-of the three they liked: past → future line, DM composer, "why" badges. Clean, flat UI driven by
-the dialogue. Rule for every beat now:
+v2's centre-stage scenes over *blurred* footage still read as muddy. v3 follows what the
+references actually do (studied frame by frame from luemmy21 / tubetactix):
 
-- **Insert** (face stays sharp): the graphic sits at chest height under her chin.
-- **Full scene**: the footage is replaced by a blurred copy of itself plus a vignette
-  (`SCENE_BG` in `tools/build.py`, from `assets/media/blur-*.mp4`). The graphic sits in the
-  centre, and when it carries the words itself, that caption group is dropped (`DROP` / `SUPPRESS`).
-- One visual language: off-white `card-light` slabs, dark `glass-dark` bars, lime/red accents,
-  Archivo, one light pass per surface, `expo.out` entrances, `back.out` only on small badges.
+- **Graphics on sharp footage at chest height** (y 700–1160, between chin and hands), with her face
+  always visible: white cards stacked with a 14px gap (the user's reference frame), lemon tiles,
+  a notification card, a ring.
+- **Light cutaways** for the two "explain the object" beats: a cream → pale-lemon ground
+  (sampled `#FDFFB6`) with a crisp white document window and ink-coloured type. Hard cut in and out.
+- **One component kit** in `tools/scenes/_base.css`: `.wcard` (pure white, radius 26, one soft
+  shadow), `.ltile` (lemon `#FEFFC4 → #F6F98A → #EDF164` with a pale `#FDFED2` bevel edge and soft
+  glow, sampled from the "1 2 3" tiles), `.ground`, `.ink-cap`.
+- **Captions re-finished to the reference**: heavy extended italic, flat bevel (white → cool
+  grey), one tight dark shadow, no deep extrusion or glow; accent is lemon `#F6F97F`, not lime.
+  Accent sizes are 80% of v2 (heroes ≤128px).
+- No placeholder skeleton rows on any card: every card carries the spoken words or an icon.
 
 | Source s | Line | Scene | Type |
 | --- | --- | --- | --- |
-| 0–1.9 | "Your visa got rejected" | `visa-status`: status pill goes from pending dots to red REJECTED; red backdrop behind her | insert |
-| 2.0–4.4 | "this one document is probably why" | `doc-pick`: five documents, four drop, one is lifted and ringed; red "?" on "why" | insert |
-| 7.5–9.6 | "after the rejection letter arrives" | `letter`: notification drops in over the blurred B&W frame, buzzes on "arrives" | full |
-| 9.56–12.5 | "It's called your statement of purpose" | `sop-title`: kinetic words, initials in lime, collapse into "SOP" + underline | full, no captions |
-| 12.5–16.0 | "…getting it wrong… visas get denied" | captions, punch on "denied" | face |
-| 16.6–21.8 | "A weak SOP has generic goals, copied lines, zero personal story" | `slabs-weak`: header with red WEAK SOP pill, three icon slabs stack per phrase, each gets a red ✕ | full, no captions |
-| 22.2–24.6 | "The officer has seen it a hundred times" | `hundred`: one SOP, then 99 identical copies fill a 10×10 grid, ×1 → ×100 | full |
+| 0–1.9 | "Your visa got rejected" | `visa-status`: white "Visa application" card, pill goes from "In review ···" to red REJECTED; red backdrop behind her | chest card |
+| 2.0–4.4 | "this one document is probably why" | `doc-pick`: five lemon document tiles, four drop; hand-drawn callout "THIS ONE." (as spoken); red "?" on "why" | chest tiles |
+| 7.5–9.6 | "after the rejection letter arrives" | `letter`: notification card with stacked ghost lands and buzzes over the B&W frame | chest card |
+| 9.56–12.5 | "It's called your statement of purpose" | `sop-title`: light cutaway, document window; heading set as spoken, initials marked in lemon, words clear and one "SOP" tile lands | cutaway |
+| 16.6–21.8 | "A weak SOP has generic goals, copied lines, zero personal story" | `slabs-weak`: red "WEAK SOP" tab + three white cards, each struck through with a red ✕ at the end of its phrase | chest cards |
+| 22.2–24.6 | "The officer has seen it a hundred times" | `hundred`: light cutaway, ink headline as spoken, one SOP then 99 identical copies, ×1 → ×100 | cutaway |
 | 25.0–26.2 | "Instant red flag" | red backdrop behind her | face |
-| 28.2–29.2 | "answers three things" | `slabs-strong`: three numbered empty slabs, answered next by the "why" badges | full |
-| 29.7–32.6 | "Why this country / course / now" | numbered badge captions (kept, user favourite) | face |
-| 33.4–37.2 | "connects your past to your future in one clean line" | `past-future` (kept) | insert |
-| 39.0–40.9 | "in the next 60 days" | 60 counts up (kept) | face |
-| 41.1–44.8 | "Work Abroad Consultancy… free SOP reviews this month" | `brand`: compact name card, then offer and month pills arrive as spoken | full, no captions |
-| 45.5–48.0 | "DM the word SOP or hit the link in bio" | `dm` (kept) | insert |
+| 26.9–32.8 | "answers three things. Why this country / course / now" | `tiles-why`: lemon tiles 1 2 3 pop on "three things", each flips to its answer icon + label on its "why" (spans a jump cut; timed through the edit map) | chest tiles |
+| 33.4–37.2 | "past to your future in one clean line" | `past-future` (kept, lemon recolour) | chest |
+| 39.7–41.1 | "in the next 60 days" | `ring-60`: countdown ring fills as 0 → 60 | chest ring |
+| 41.1–44.8 | "Work Abroad Consultancy… free SOP reviews this month" | `brand`: same white-card stack: name, "Free SOP reviews", "This month", each as spoken | chest cards |
+| 45.5–48.0 | "DM the word SOP or hit the link in bio" | `dm` (kept, lemon recolour) | chest |
 | 48.6–50.8 | "Don't let a fixable mistake cost you a year" | captions, slow push-in, 1.24s end freeze | face |
 
 Custom assets: every icon slot has a built-in line icon. Dropping `assets/custom/<name>.png` in
@@ -57,14 +60,16 @@ place (prompts in `ASSET_PROMPTS.md`) swaps it in on the next `python tools/buil
 
 | Role | Hex | Use |
 | --- | --- | --- |
-| Red tint | `#FFE6E8` / `#D61F31` | icon tiles on the weak-SOP slabs |
+| Red tint | `#FFE3E6` / `#E0162A` | icon discs on the weak-SOP cards |
+| Lemon | `#F6F97F` (tiles `#FEFFC4→#EDF164`, edge `#FDFED2`) | replaces v2 lime `#E6F54A` everywhere |
+| Ground | `#FDFFB6 → #FBFBF4` | light cutaways |
 | Navy | `#1C2442` | brand card bar, tag, name |
 
 ## Build
 
 ```bash
 npx hyperframes remove-background prachi-full.mp4 -o /tmp/subject-full.webm --quality best
-tools/make_plate.sh /tmp/subject-full.webm   # dimmed-room plate, red-flag cutout, end-hold frame, blur plates
+tools/make_plate.sh /tmp/subject-full.webm   # dimmed-room plate, red-flag cutout, end-hold frame
 python tools/build.py                        # index.html + every compositions/*.html from tools/scenes
 npm run check && npm run render
 ```

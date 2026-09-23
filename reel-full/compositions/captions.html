@@ -25,7 +25,7 @@
       :root {
         --night: #0e0b10;
         --white: #fbfbf6;
-        --lime: #e6f54a;
+        --lime: #f6f97f;
         --alarm: #ff2e3f;
       }
       #root {
@@ -60,33 +60,29 @@
         white-space: nowrap;
         line-height: 1;
       }
-      /* Word = 3 stacked layers of the same glyphs:
-         ::before  dark extrusion (3D depth) + drop shadow, behind
-         face      solid colour + soft glow (what contrast checks read)
-         ::after   gradient fill + moving light sweep, clipped to the glyphs, in front */
+      /* Reference finish (luemmy21): heavy extended italic, flat-bevelled face (white -> cool grey),
+         one tight dark shadow for lift. No deep extrusion, no glow.
+         ::before  tight drop shadow layer, behind
+         face      solid tone colour (what contrast checks read)
+         ::after   vertical bevel gradient + optional light pass (--shine), clipped to the glyphs */
       .w {
         position: relative;
         isolation: isolate;
         display: inline-block;
-        margin: 0 0.12em;
+        margin: 0 0.1em;
         font-family: "Archivo", sans-serif;
         font-style: italic;
         font-weight: 900;
-        font-stretch: 118%;
+        font-stretch: 122%;
         text-transform: uppercase;
-        letter-spacing: -0.01em;
-        font-size: 80px;
-        line-height: 1.02;
+        letter-spacing: -0.005em;
+        font-size: 66px;
+        line-height: 1.04;
         transform-origin: 50% 70%;
         --shine: -40%;
-        --fill: linear-gradient(180deg, #ffffff 0%, #f4f4ef 46%, #d4d6df 72%, #b3b6c4 100%);
-        --ext: #2b2731;
-        --glow: rgba(251, 251, 246, 0.18);
-        --glow2: rgba(14, 11, 16, 0.35);
-        color: var(--white);
-        text-shadow:
-          0 0 14px var(--glow),
-          0 0 30px var(--glow2);
+        --fill: linear-gradient(180deg, #ffffff 0%, #ffffff 48%, #e3e5ea 62%, #c7cad3 100%);
+        --sh: rgba(8, 6, 10, 0.72);
+        color: #fbfbf6;
       }
       .w::before,
       .w::after {
@@ -100,25 +96,19 @@
       }
       .w::before {
         z-index: -1;
-        color: var(--ext);
+        color: var(--sh);
         text-shadow:
-          -0.018em 0 0 var(--ext),
-          0.018em 0 0 var(--ext),
-          0 -0.018em 0 var(--ext),
-          0.01em 0.012em 0 var(--ext),
-          0.02em 0.024em 0 var(--ext),
-          0.03em 0.036em 0 var(--ext),
-          0.04em 0.048em 0 var(--ext),
-          0.03em 0.12em 0.18em rgba(14, 11, 16, 0.75);
+          0.012em 0.035em 0 var(--sh),
+          0 0.05em 0.16em rgba(8, 6, 10, 0.55);
       }
       .w::after {
         z-index: 1;
         background:
           linear-gradient(
             104deg,
-            rgba(255, 255, 255, 0) calc(var(--shine) - 9%),
-            rgba(255, 255, 255, 0.95) var(--shine),
-            rgba(255, 255, 255, 0) calc(var(--shine) + 9%)
+            rgba(255, 255, 255, 0) calc(var(--shine) - 8%),
+            rgba(255, 255, 255, 0.9) var(--shine),
+            rgba(255, 255, 255, 0) calc(var(--shine) + 8%)
           ),
           var(--fill);
         -webkit-background-clip: text;
@@ -128,43 +118,38 @@
         text-shadow: none;
       }
       .w.lime {
-        color: var(--lime);
-        --fill: linear-gradient(180deg, #fcffd9 0%, #f0fb8a 34%, #e6f54a 58%, #b5cd10 100%);
-        --ext: #3f4a04;
-        --glow: rgba(230, 245, 74, 0.38);
-        --glow2: rgba(14, 11, 16, 0.3);
+        color: #f6f97f;
+        --fill: linear-gradient(180deg, #feffc9 0%, #fbfd9c 45%, #f1f56a 62%, #d9de45 100%);
+        --sh: rgba(16, 16, 4, 0.78);
       }
       .w.red {
-        color: var(--alarm);
-        --fill: linear-gradient(180deg, #ffc2c9 0%, #ff6674 32%, #ff2e3f 58%, #b50b22 100%);
-        --ext: #4d0610;
-        --glow: rgba(255, 46, 63, 0.45);
-        --glow2: rgba(14, 11, 16, 0.3);
+        color: #ff3344;
+        --fill: linear-gradient(180deg, #ff8a95 0%, #ff4a58 45%, #ec1c2f 62%, #c20f22 100%);
+        --sh: rgba(22, 4, 6, 0.8);
       }
+      /* Lemon tile badge (same object as the scene tiles). */
       .badge {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 104px;
-        height: 104px;
-        margin-right: 22px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 36% 30%, #fcffd9 0%, #eefa7a 30%, #e6f54a 55%, #aac40c 100%);
+        width: 96px;
+        height: 96px;
+        margin-right: 20px;
+        border-radius: 26px;
+        background: linear-gradient(180deg, #feffc4, #f6f98a 55%, #edf164);
         box-shadow:
-          0 7px 0 #3f4a04,
-          0 0 0 6px var(--night),
-          0 7px 0 6px var(--night),
-          0 0 44px rgba(230, 245, 74, 0.75),
-          0 18px 30px rgba(14, 11, 16, 0.7);
+          inset 0 0 0 5px #fdfed2,
+          inset 0 -6px 10px rgba(170, 170, 30, 0.35),
+          0 0 26px rgba(248, 250, 140, 0.45),
+          0 14px 26px rgba(8, 6, 10, 0.45);
         font-family: "Archivo", sans-serif;
         font-style: italic;
         font-weight: 900;
         font-stretch: 118%;
-        font-size: 70px;
-        color: var(--night);
+        font-size: 62px;
+        color: #15121a;
         line-height: 1;
-        padding-right: 6px;
-        text-shadow: 0 2px 0 rgba(251, 251, 246, 0.6);
+        padding-right: 4px;
       }
       </style>
 
@@ -188,7 +173,7 @@
       const wi = (i) => W[i][0];
 
       // Caption groups (source s). l1 = small white line, l2 = accent lines; size = accent px.
-      const GROUPS = [{"l1": [0, 1, 2], "l2": [[3]], "tone": "red", "size": 140, "start": 0.0, "hero": [3], "end": 2.06}, {"l1": [4, 5], "l2": [[6, 7]], "tone": "lime", "size": 84, "start": 2.06, "badge": {"before": 6, "text": "1"}, "end": 3.14}, {"l1": [8, 9], "l2": [[10]], "tone": "lime", "size": 156, "start": 3.14, "hero": [10], "end": 4.44}, {"l1": [11, 12], "l2": [[13, 14, 15]], "tone": "lime", "size": 88, "start": 5.18, "end": 6.86}, {"l1": [16, 17], "l2": [[18], [19]], "tone": "red", "size": 124, "start": 6.86, "end": 8.32}, {"l1": [], "l2": [[20]], "tone": "white", "size": 156, "start": 8.32, "hero": [20], "end": 9.56}, {"l1": [27, 28], "l2": [[29, 30]], "tone": "red", "size": 124, "start": 12.5, "end": 13.08}, {"l1": [31, 32, 33], "l2": [[34, 35]], "tone": "white", "size": 96, "start": 13.08, "end": 14.7}, {"l1": [36, 37], "l2": [[38]], "tone": "red", "size": 150, "start": 14.7, "hero": [38], "end": 16.64}, {"l1": [50, 51], "l2": [[52, 53, 54]], "tone": "white", "size": 100, "start": 22.34, "end": 23.38}, {"l1": [55], "l2": [[56], [57]], "tone": "lime", "size": 120, "start": 23.38, "end": 25.04}, {"l1": [58], "l2": [[59, 60]], "tone": "red", "size": 140, "start": 25.04, "hero": [59, 60], "end": 26.96}, {"l1": [61], "l2": [[62], [63]], "tone": "lime", "size": 130, "start": 26.96, "end": 27.86}, {"l1": [64], "l2": [[65], [66]], "tone": "lime", "size": 120, "start": 27.86, "end": 29.74}, {"l1": [], "l2": [[67, 68], [69]], "tone": "white", "size": 110, "start": 29.74, "badge": {"before": 67, "text": "1"}, "end": 31.02}, {"l1": [], "l2": [[70, 71], [72]], "tone": "white", "size": 110, "start": 31.02, "badge": {"before": 70, "text": "2"}, "end": 32.14}, {"l1": [], "l2": [[73], [74]], "tone": "lime", "size": 150, "start": 32.14, "badge": {"before": 73, "text": "3"}, "hero": [74], "end": 33.44}, {"l1": [75, 76], "l2": [[77, 78]], "tone": "white", "size": 110, "start": 33.44, "end": 34.52}, {"l1": [79], "l2": [[80, 81]], "tone": "lime", "size": 104, "start": 34.52, "end": 35.38}, {"l1": [82, 83], "l2": [[84, 85]], "tone": "lime", "size": 108, "start": 35.38, "end": 37.56}, {"l1": [], "l2": [[86, 87]], "tone": "white", "size": 124, "start": 37.56, "hero": [86, 87], "end": 39.04}, {"l1": [88, 89], "l2": [[90]], "tone": "white", "size": 120, "start": 39.04, "end": 39.66}, {"l1": [91, 92, 93], "l2": [[94, 95]], "tone": "lime", "size": 150, "start": 39.66, "hero": [94], "count": true, "end": 41.1}, {"l1": [106, 107, 108], "l2": [[109]], "tone": "lime", "size": 156, "start": 45.5, "hero": [109], "end": 46.56}, {"l1": [110, 111, 112], "l2": [[113, 114, 115]], "tone": "white", "size": 100, "start": 46.56, "end": 48.56}, {"l1": [116, 117, 118], "l2": [[119], [120]], "tone": "white", "size": 116, "start": 48.56, "end": 49.88}, {"l1": [], "l2": [[121, 122], [123, 124]], "tone": "red", "size": 132, "start": 49.88, "hero": [124], "end": 60}];
+      const GROUPS = [{"l1": [0, 1, 2], "l2": [[3]], "tone": "red", "size": 112, "start": 0.0, "hero": [3], "end": 2.06}, {"l1": [4, 5], "l2": [[6, 7]], "tone": "lime", "size": 67, "start": 2.06, "badge": {"before": 6, "text": "1"}, "end": 3.14}, {"l1": [8, 9], "l2": [[10]], "tone": "lime", "size": 125, "start": 3.14, "hero": [10], "end": 4.44}, {"l1": [11, 12], "l2": [[13, 14, 15]], "tone": "lime", "size": 70, "start": 5.18, "end": 6.86}, {"l1": [16, 17], "l2": [[18], [19]], "tone": "red", "size": 99, "start": 6.86, "end": 8.32}, {"l1": [], "l2": [[20]], "tone": "white", "size": 125, "start": 8.32, "hero": [20], "end": 9.56}, {"l1": [27, 28], "l2": [[29, 30]], "tone": "red", "size": 99, "start": 12.5, "end": 13.08}, {"l1": [31, 32, 33], "l2": [[34, 35]], "tone": "white", "size": 77, "start": 13.08, "end": 14.7}, {"l1": [36, 37], "l2": [[38]], "tone": "red", "size": 120, "start": 14.7, "hero": [38], "end": 16.64}, {"l1": [58], "l2": [[59, 60]], "tone": "red", "size": 112, "start": 25.04, "hero": [59, 60], "end": 26.96}, {"l1": [61], "l2": [[62], [63]], "tone": "lime", "size": 104, "start": 26.96, "end": 27.86}, {"l1": [64], "l2": [[65], [66]], "tone": "lime", "size": 96, "start": 27.86, "end": 29.74}, {"l1": [], "l2": [[67, 68], [69]], "tone": "white", "size": 88, "start": 29.74, "badge": {"before": 67, "text": "1"}, "end": 31.02}, {"l1": [], "l2": [[70, 71], [72]], "tone": "white", "size": 88, "start": 31.02, "badge": {"before": 70, "text": "2"}, "end": 32.14}, {"l1": [], "l2": [[73], [74]], "tone": "lime", "size": 120, "start": 32.14, "badge": {"before": 73, "text": "3"}, "hero": [74], "end": 33.44}, {"l1": [75, 76], "l2": [[77, 78]], "tone": "white", "size": 88, "start": 33.44, "end": 34.52}, {"l1": [79], "l2": [[80, 81]], "tone": "lime", "size": 83, "start": 34.52, "end": 35.38}, {"l1": [82, 83], "l2": [[84, 85]], "tone": "lime", "size": 86, "start": 35.38, "end": 37.56}, {"l1": [], "l2": [[86, 87]], "tone": "white", "size": 99, "start": 37.56, "hero": [86, 87], "end": 39.04}, {"l1": [88, 89], "l2": [[90]], "tone": "white", "size": 96, "start": 39.04, "end": 39.66}, {"l1": [106, 107, 108], "l2": [[109]], "tone": "lime", "size": 125, "start": 45.5, "hero": [109], "end": 46.56}, {"l1": [110, 111, 112], "l2": [[113, 114, 115]], "tone": "white", "size": 80, "start": 46.56, "end": 48.56}, {"l1": [116, 117, 118], "l2": [[119], [120]], "tone": "white", "size": 93, "start": 48.56, "end": 49.88}, {"l1": [], "l2": [[121, 122], [123, 124]], "tone": "red", "size": 106, "start": 49.88, "hero": [124], "end": 60}];
 
       const LEAD = 0.04;
       const MAXW = 940;

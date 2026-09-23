@@ -25,7 +25,7 @@
       :root {
         --night: #0e0b10;
         --white: #fbfbf6;
-        --lime: #e6f54a;
+        --lime: #f6f97f;
         --alarm: #ff2e3f;
       }
       #root {
@@ -60,33 +60,29 @@
         white-space: nowrap;
         line-height: 1;
       }
-      /* Word = 3 stacked layers of the same glyphs:
-         ::before  dark extrusion (3D depth) + drop shadow, behind
-         face      solid colour + soft glow (what contrast checks read)
-         ::after   gradient fill + moving light sweep, clipped to the glyphs, in front */
+      /* Reference finish (luemmy21): heavy extended italic, flat-bevelled face (white -> cool grey),
+         one tight dark shadow for lift. No deep extrusion, no glow.
+         ::before  tight drop shadow layer, behind
+         face      solid tone colour (what contrast checks read)
+         ::after   vertical bevel gradient + optional light pass (--shine), clipped to the glyphs */
       .w {
         position: relative;
         isolation: isolate;
         display: inline-block;
-        margin: 0 0.12em;
+        margin: 0 0.1em;
         font-family: "Archivo", sans-serif;
         font-style: italic;
         font-weight: 900;
-        font-stretch: 118%;
+        font-stretch: 122%;
         text-transform: uppercase;
-        letter-spacing: -0.01em;
-        font-size: 80px;
-        line-height: 1.02;
+        letter-spacing: -0.005em;
+        font-size: 66px;
+        line-height: 1.04;
         transform-origin: 50% 70%;
         --shine: -40%;
-        --fill: linear-gradient(180deg, #ffffff 0%, #f4f4ef 46%, #d4d6df 72%, #b3b6c4 100%);
-        --ext: #2b2731;
-        --glow: rgba(251, 251, 246, 0.18);
-        --glow2: rgba(14, 11, 16, 0.35);
-        color: var(--white);
-        text-shadow:
-          0 0 14px var(--glow),
-          0 0 30px var(--glow2);
+        --fill: linear-gradient(180deg, #ffffff 0%, #ffffff 48%, #e3e5ea 62%, #c7cad3 100%);
+        --sh: rgba(8, 6, 10, 0.72);
+        color: #fbfbf6;
       }
       .w::before,
       .w::after {
@@ -100,25 +96,19 @@
       }
       .w::before {
         z-index: -1;
-        color: var(--ext);
+        color: var(--sh);
         text-shadow:
-          -0.018em 0 0 var(--ext),
-          0.018em 0 0 var(--ext),
-          0 -0.018em 0 var(--ext),
-          0.01em 0.012em 0 var(--ext),
-          0.02em 0.024em 0 var(--ext),
-          0.03em 0.036em 0 var(--ext),
-          0.04em 0.048em 0 var(--ext),
-          0.03em 0.12em 0.18em rgba(14, 11, 16, 0.75);
+          0.012em 0.035em 0 var(--sh),
+          0 0.05em 0.16em rgba(8, 6, 10, 0.55);
       }
       .w::after {
         z-index: 1;
         background:
           linear-gradient(
             104deg,
-            rgba(255, 255, 255, 0) calc(var(--shine) - 9%),
-            rgba(255, 255, 255, 0.95) var(--shine),
-            rgba(255, 255, 255, 0) calc(var(--shine) + 9%)
+            rgba(255, 255, 255, 0) calc(var(--shine) - 8%),
+            rgba(255, 255, 255, 0.9) var(--shine),
+            rgba(255, 255, 255, 0) calc(var(--shine) + 8%)
           ),
           var(--fill);
         -webkit-background-clip: text;
@@ -128,43 +118,38 @@
         text-shadow: none;
       }
       .w.lime {
-        color: var(--lime);
-        --fill: linear-gradient(180deg, #fcffd9 0%, #f0fb8a 34%, #e6f54a 58%, #b5cd10 100%);
-        --ext: #3f4a04;
-        --glow: rgba(230, 245, 74, 0.38);
-        --glow2: rgba(14, 11, 16, 0.3);
+        color: #f6f97f;
+        --fill: linear-gradient(180deg, #feffc9 0%, #fbfd9c 45%, #f1f56a 62%, #d9de45 100%);
+        --sh: rgba(16, 16, 4, 0.78);
       }
       .w.red {
-        color: var(--alarm);
-        --fill: linear-gradient(180deg, #ffc2c9 0%, #ff6674 32%, #ff2e3f 58%, #b50b22 100%);
-        --ext: #4d0610;
-        --glow: rgba(255, 46, 63, 0.45);
-        --glow2: rgba(14, 11, 16, 0.3);
+        color: #ff3344;
+        --fill: linear-gradient(180deg, #ff8a95 0%, #ff4a58 45%, #ec1c2f 62%, #c20f22 100%);
+        --sh: rgba(22, 4, 6, 0.8);
       }
+      /* Lemon tile badge (same object as the scene tiles). */
       .badge {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 104px;
-        height: 104px;
-        margin-right: 22px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 36% 30%, #fcffd9 0%, #eefa7a 30%, #e6f54a 55%, #aac40c 100%);
+        width: 96px;
+        height: 96px;
+        margin-right: 20px;
+        border-radius: 26px;
+        background: linear-gradient(180deg, #feffc4, #f6f98a 55%, #edf164);
         box-shadow:
-          0 7px 0 #3f4a04,
-          0 0 0 6px var(--night),
-          0 7px 0 6px var(--night),
-          0 0 44px rgba(230, 245, 74, 0.75),
-          0 18px 30px rgba(14, 11, 16, 0.7);
+          inset 0 0 0 5px #fdfed2,
+          inset 0 -6px 10px rgba(170, 170, 30, 0.35),
+          0 0 26px rgba(248, 250, 140, 0.45),
+          0 14px 26px rgba(8, 6, 10, 0.45);
         font-family: "Archivo", sans-serif;
         font-style: italic;
         font-weight: 900;
         font-stretch: 118%;
-        font-size: 70px;
-        color: var(--night);
+        font-size: 62px;
+        color: #15121a;
         line-height: 1;
-        padding-right: 6px;
-        text-shadow: 0 2px 0 rgba(251, 251, 246, 0.6);
+        padding-right: 4px;
       }
       </style>
 

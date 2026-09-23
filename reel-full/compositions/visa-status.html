@@ -84,58 +84,118 @@
           background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
           transform: translateX(var(--sx, -140%)) skewX(-12deg);
         }
-        /* "Your visa got rejected": a status card at chest height; her face stays in frame. */
+
+        /* ---------- v3 reference components (luemmy21 / tubetactix) ---------- */
+        /* White card: the "Storyblocks" card. Pure white, modest radius, one soft shadow. */
+        .wcard {
+          background: #ffffff;
+          border-radius: 26px;
+          box-shadow:
+            0 2px 0 rgba(255, 255, 255, 0.9) inset,
+            0 18px 40px rgba(8, 6, 10, 0.38),
+            0 3px 8px rgba(8, 6, 10, 0.22);
+        }
+        /* Lemon tile: the "1 2 3 / Pr" tile. Pale bevel edge, soft glow. */
+        .ltile {
+          border-radius: 34px;
+          background: linear-gradient(180deg, #feffc4 0%, #f6f98a 55%, #edf164 100%);
+          box-shadow:
+            inset 0 0 0 6px #fdfed2,
+            inset 0 -8px 14px rgba(170, 170, 30, 0.32),
+            0 0 30px rgba(248, 250, 140, 0.42),
+            0 16px 30px rgba(8, 6, 10, 0.42);
+          color: #15121a;
+        }
+        .ltile.dark {
+          background: linear-gradient(180deg, #2a2a33, #16151c);
+          box-shadow:
+            inset 0 0 0 6px #fdfed2,
+            0 0 30px rgba(248, 250, 140, 0.42),
+            0 16px 30px rgba(8, 6, 10, 0.42);
+          color: #f6f97f;
+        }
+        .tnum {
+          font-style: italic;
+          font-weight: 900;
+          font-stretch: 122%;
+          line-height: 1;
+          color: #15121a;
+        }
+        /* Light cutaway ground (luemmy21 UI scenes): cream -> pale lemon at the corners. */
+        .ground {
+          position: absolute;
+          inset: 0;
+          background:
+            radial-gradient(ellipse 70% 55% at 50% 48%, #ffffff 0%, rgba(255, 255, 255, 0) 70%),
+            linear-gradient(160deg, #fdffb6 0%, #fbfde2 42%, #fbfbf4 60%, #fdffc0 100%);
+        }
+        .ink-cap {
+          font-style: italic;
+          font-weight: 900;
+          font-stretch: 122%;
+          text-transform: uppercase;
+          line-height: 1.02;
+          color: #15121a;
+        }
+        .ink-cap .hl {
+          color: #15121a;
+          background: linear-gradient(180deg, transparent 58%, #f6f97f 58%, #f6f97f 92%, transparent 92%);
+          padding: 0 0.08em;
+        }
+        /* "Your visa got rejected": reference white card at chest; the status flips on "rejected". */
         .vs {
           position: absolute;
-          left: 150px;
-          top: 820px;
-          width: 780px;
-          height: 200px;
-          border-radius: 38px;
+          left: 110px;
+          top: 740px;
+          width: 860px;
+          height: 156px;
           display: flex;
           align-items: center;
-          gap: 32px;
-          padding: 0 36px;
+          gap: 26px;
+          padding: 0 26px;
           box-sizing: border-box;
           opacity: 0;
         }
         .vs .ico {
-          width: 128px;
-          height: 128px;
-          border-radius: 30px;
+          width: 104px;
+          height: 104px;
+          border-radius: 50%;
           background: #1c2442;
-          color: #e8ddb5;
-          box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.18);
+          color: #f6f97f;
         }
-        .lab {
-          font-weight: 700;
-          font-size: 28px;
-          letter-spacing: 0.14em;
-          color: #6b6e7a;
-          text-transform: uppercase;
+        .name {
+          flex: 1;
+          font-weight: 800;
+          font-size: 46px;
+          letter-spacing: -0.02em;
+          color: #15121a;
+          white-space: nowrap;
         }
         .pill {
           position: relative;
-          margin-top: 14px;
-          width: 440px;
-          height: 86px;
-          border-radius: 43px;
-          background: #e6e5df;
-          box-shadow: inset 0 2px 4px rgba(14, 11, 16, 0.12);
+          width: 250px;
+          height: 80px;
+          border-radius: 42px;
+          background: #eeeef0;
+          flex: none;
         }
-        .dots {
+        .pend {
           position: absolute;
-          left: 38px;
-          top: 33px;
+          inset: 0;
           display: flex;
-          gap: 14px;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          font-weight: 700;
+          font-size: 29px;
+          color: #7b7e89;
         }
         .dot {
           display: block;
-          width: 20px;
-          height: 20px;
+          width: 12px;
+          height: 12px;
           border-radius: 50%;
-          background: #a3a5ae;
+          background: #9a9daa;
         }
         .status {
           position: absolute;
@@ -143,35 +203,33 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 16px;
-          border-radius: 43px;
+          gap: 12px;
+          border-radius: 42px;
           background: linear-gradient(180deg, #ff4a58, #e0162a);
-          box-shadow: 0 10px 24px rgba(224, 22, 42, 0.45);
+          box-shadow: 0 10px 22px rgba(224, 22, 42, 0.42);
           color: #ffffff;
           font-style: italic;
           font-weight: 900;
           font-stretch: 118%;
-          font-size: 48px;
-          letter-spacing: 0.02em;
+          font-size: 34px;
+          letter-spacing: 0.01em;
           opacity: 0;
         }
         .status svg {
-          width: 34px;
-          height: 34px;
+          width: 28px;
+          height: 28px;
         }
       </style>
 
       <div id="root" data-composition-id="visa-status" data-width="1080" data-height="1920">
-        <div class="vs card-light" id="vs">
+        <div class="vs wcard" id="vs">
           <div class="slot ico "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="2.2"/><circle cx="12" cy="10.5" r="3.6"/><path d="M8.4 10.5h7.2M12 6.9c1.3 1 1.3 6.2 0 7.2M12 6.9c-1.3 1-1.3 6.2 0 7.2M9 17.5h6"/></svg></div>
-          <div>
-            <div class="lab">Your visa</div>
-            <div class="pill">
-              <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-              <div class="status" id="status">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
-                <span>REJECTED</span>
-              </div>
+          <div class="name">Visa application</div>
+          <div class="pill">
+            <div class="pend" id="pend"><span>In review</span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="status" id="status">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+              <span>REJECTED</span>
             </div>
           </div>
           <div class="shine" id="vs-shine"></div>
@@ -180,16 +238,15 @@
 
       <script>
         (function () {
-          const C = {"inAt": 0.02, "flip": 0.94, "outAt": 1.7};
+          const C = {"inAt": 0.04, "flip": 0.94, "outAt": 1.74};
           const tl = gsap.timeline({ paused: true });
-          tl.fromTo("#vs", { opacity: 0, y: 70, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "expo.out" }, C.inAt);
-          // Pending dots breathe (finite) until the verdict lands.
-          tl.fromTo(".dot", { opacity: 0.35 }, { opacity: 1, duration: 0.2, ease: "sine.inOut", stagger: 0.1, yoyo: true, repeat: 1 }, C.inAt + 0.2);
-          tl.fromTo("#status", { opacity: 0, scale: 1.22 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power3.out" }, C.flip - 0.04);
-          tl.to(".dots", { opacity: 0, duration: 0.08 }, C.flip - 0.04);
-          tl.to("#vs", { keyframes: [{ x: 10 }, { x: -8 }, { x: 5 }, { x: 0 }], duration: 0.2, ease: "none" }, C.flip + 0.1);
-          tl.fromTo("#vs-shine", { "--sx": "-140%" }, { "--sx": "320%", duration: 0.6, ease: "power2.inOut" }, C.flip + 0.2);
-          tl.to("#vs", { y: 40, opacity: 0, duration: 0.24, ease: "power2.in" }, C.outAt);
+          tl.fromTo("#vs", { opacity: 0, y: 50, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "back.out(1.5)" }, C.inAt);
+          tl.fromTo(".dot", { opacity: 0.3 }, { opacity: 1, duration: 0.16, ease: "sine.inOut", stagger: 0.08, yoyo: true, repeat: 1 }, C.inAt + 0.3);
+          tl.to("#pend", { opacity: 0, duration: 0.06 }, C.flip - 0.06);
+          tl.fromTo("#status", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.2, ease: "back.out(2)" }, C.flip - 0.06);
+          tl.to("#vs", { keyframes: [{ x: 10 }, { x: -8 }, { x: 5 }, { x: 0 }], duration: 0.2, ease: "none" }, C.flip + 0.08);
+          tl.fromTo("#vs-shine", { "--sx": "-140%" }, { "--sx": "360%", duration: 0.6, ease: "power2.inOut" }, C.flip + 0.24);
+          tl.to("#vs", { y: 30, opacity: 0, scale: 0.96, duration: 0.2, ease: "power2.in" }, C.outAt);
           window.__timelines["visa-status"] = tl;
         })();
       </script>

@@ -8,74 +8,72 @@
     <template>
       <style>
 {{BASE_CSS}}
-        /* "the rejection letter arrives": a notification drops in over the blurred B&W frame. */
-        .nt {
+        /* "the rejection letter arrives": a lock-screen notification lands at chest over the B&W frame. */
+        .nt,
+        .ghost {
           position: absolute;
-          left: 80px;
-          top: 470px;
-          width: 920px;
-          height: 196px;
-          border-radius: 46px;
+          left: 90px;
+          top: 740px;
+          width: 900px;
+          height: 168px;
+          border-radius: 44px;
+          box-sizing: border-box;
+        }
+        .nt {
           display: flex;
           align-items: center;
-          gap: 30px;
-          padding: 0 38px;
-          box-sizing: border-box;
+          gap: 26px;
+          padding: 0 34px 0 30px;
+          opacity: 0;
+        }
+        .ghost {
+          background: rgba(255, 255, 255, 0.55);
+          box-shadow: 0 14px 30px rgba(8, 6, 10, 0.3);
           opacity: 0;
         }
         .nt .ico {
-          width: 120px;
-          height: 120px;
-          border-radius: 30px;
-          background: #fbfbf6;
-          color: #15121a;
+          width: 104px;
+          height: 104px;
+          border-radius: 26px;
+          background: linear-gradient(180deg, #ff4a58, #e0162a);
+          color: #ffffff;
         }
         .badge {
           position: absolute;
-          right: -8px;
-          top: -8px;
-          width: 34px;
-          height: 34px;
-          border-radius: 50%;
-          background: #ff2e3f;
-          box-shadow: 0 0 0 5px rgba(22, 19, 27, 0.9);
+          right: -10px;
+          top: -10px;
+          min-width: 38px;
+          height: 38px;
+          border-radius: 19px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #15121a;
+          color: #ffffff;
+          font-weight: 800;
+          font-size: 24px;
+          box-shadow: 0 0 0 4px #ffffff;
           opacity: 0;
         }
         .title {
+          flex: 1;
           font-weight: 800;
-          font-size: 48px;
-          letter-spacing: -0.01em;
-          color: #fbfbf6;
-        }
-        .bars {
-          margin-top: 16px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-        .bars span {
-          display: block;
-          height: 14px;
-          border-radius: 7px;
-          background: rgba(251, 251, 246, 0.26);
+          font-size: 50px;
+          letter-spacing: -0.02em;
+          color: #15121a;
         }
         .now {
-          position: absolute;
-          right: 42px;
-          top: 40px;
           font-weight: 600;
-          font-size: 28px;
-          color: rgba(251, 251, 246, 0.55);
+          font-size: 30px;
+          color: #8a8d98;
         }
       </style>
 
       <div id="root" data-composition-id="__ID__" data-width="1080" data-height="1920">
-        <div class="nt glass-dark" id="nt">
-          <div class="slot ico {{HAS:envelope}}">{{SLOT:envelope}}<span class="badge" id="badge"></span></div>
-          <div>
-            <div class="title">Rejection letter</div>
-            <div class="bars"><span style="width: 520px"></span><span style="width: 360px"></span></div>
-          </div>
+        <div class="ghost" id="ghost"></div>
+        <div class="nt wcard" id="nt">
+          <div class="slot ico {{HAS:envelope}}">{{SLOT:envelope}}<span class="badge" id="badge">1</span></div>
+          <div class="title">Rejection letter</div>
           <div class="now">now</div>
         </div>
       </div>
@@ -84,11 +82,11 @@
         (function () {
           const C = {{CFG}};
           const tl = gsap.timeline({ paused: true });
-          tl.fromTo("#nt", { opacity: 0, y: -520, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "expo.out" }, C.inAt);
-          tl.fromTo("#badge", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.6)" }, C.land);
-          // Haptic buzz as it lands.
-          tl.to("#nt", { keyframes: [{ x: 8 }, { x: -7 }, { x: 5 }, { x: -3 }, { x: 0 }], duration: 0.24, ease: "none" }, C.land);
-          tl.to("#nt", { y: -520, opacity: 0, duration: 0.24, ease: "power2.in" }, C.outAt);
+          tl.fromTo("#nt", { opacity: 0, y: -260, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "expo.out" }, C.inAt);
+          tl.fromTo("#ghost", { opacity: 0, y: -240, scale: 0.9 }, { opacity: 1, y: 22, scale: 0.94, duration: 0.5, ease: "expo.out" }, C.inAt + 0.05);
+          tl.fromTo("#badge", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.28, ease: "back.out(2.6)" }, C.land);
+          tl.to("#nt", { keyframes: [{ x: 9 }, { x: -8 }, { x: 6 }, { x: -3 }, { x: 0 }], duration: 0.26, ease: "none" }, C.land);
+          tl.to(["#nt", "#ghost"], { y: -200, opacity: 0, duration: 0.22, ease: "power2.in" }, C.outAt);
           window.__timelines["__ID__"] = tl;
         })();
       </script>
