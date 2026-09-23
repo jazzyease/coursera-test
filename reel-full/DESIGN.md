@@ -11,7 +11,7 @@ references actually do (studied frame by frame from luemmy21 / tubetactix):
 - **Graphics on sharp footage at chest height** (y 700–1160, between chin and hands), with her face
   always visible: white cards stacked with a 14px gap (the user's reference frame), lemon tiles,
   a notification card, a ring.
-- **Light cutaways** for the two "explain the object" beats: a cream → pale-lemon ground
+- **Light cutaway** for "a hundred times" (the SOP beat moved to chest cards in v4, the user's one remaining note): a cream → pale-lemon ground
   (sampled `#FDFFB6`) with a crisp white document window and ink-coloured type. Hard cut in and out.
 - **One component kit** in `tools/scenes/_base.css`: `.wcard` (pure white, radius 26, one soft
   shadow), `.ltile` (lemon `#FEFFC4 → #F6F98A → #EDF164` with a pale `#FDFED2` bevel edge and soft
@@ -26,7 +26,7 @@ references actually do (studied frame by frame from luemmy21 / tubetactix):
 | 0–1.9 | "Your visa got rejected" | `visa-status`: white "Visa application" card, pill goes from "In review ···" to red REJECTED; red backdrop behind her | chest card |
 | 2.0–4.4 | "this one document is probably why" | `doc-pick`: five lemon document tiles, four drop; hand-drawn callout "THIS ONE." (as spoken); red "?" on "why" | chest tiles |
 | 7.5–9.6 | "after the rejection letter arrives" | `letter`: notification card with stacked ghost lands and buzzes over the B&W frame | chest card |
-| 9.56–12.5 | "It's called your statement of purpose" | `sop-title`: light cutaway, document window; heading set as spoken, initials marked in lemon, words clear and one "SOP" tile lands | cutaway |
+| 9.56–13.1 | "It's called your statement of purpose" | `sop-title` (v4): the reference stack on sharp footage: a white card per word as spoken, initial in a lemon tile; the words fold away and the S·O·P tiles fly into one SOP card that holds under "and getting it wrong" | chest cards |
 | 16.6–21.8 | "A weak SOP has generic goals, copied lines, zero personal story" | `slabs-weak`: red "WEAK SOP" tab + three white cards, each struck through with a red ✕ at the end of its phrase | chest cards |
 | 22.2–24.6 | "The officer has seen it a hundred times" | `hundred`: light cutaway, ink headline as spoken, one SOP then 99 identical copies, ×1 → ×100 | cutaway |
 | 25.0–26.2 | "Instant red flag" | red backdrop behind her | face |

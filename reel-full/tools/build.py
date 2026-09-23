@@ -180,7 +180,8 @@ HOSTS = [
     ("visa-status", "scenes/visa-status.html", 0.0, 1.98, dict(inAt=0.04, flip=0.94, outAt=1.74)),
     ("doc-pick", "scenes/doc-pick.html", 1.96, 4.5, dict(inAt=0.1, pick=0.3, ring=0.46, why=2.08, outAt=2.36)),
     ("letter", "scenes/letter.html", 8.02, 9.56, dict(inAt=0.02, land=0.3, outAt=1.3)),
-    ("sop-title", "scenes/sop-title.html", 9.5, 12.6, dict(inAt=0.04, l0=[0.06, 0.72, 0.98], words=[1.12, 1.56, 1.8], collapse=2.12, outAt=2.86)),
+    # Runs past the caption resume (12.5): the SOP card sits at the chest, captions below it.
+    ("sop-title", "scenes/sop-title.html", 9.5, 13.1, dict(inAt=0.04, l0=[0.06, 0.72, 0.98], words=[1.16, 1.58, 1.82], collapse=2.2, outAt=3.36)),
     ("slabs-weak", "scenes/slabs.html", 16.64, 21.8, dict(
         top=736, h=132, gap=14, outAt=None,
         tab=dict(text="WEAK SOP", tone="red", at=L(w(40), 16.64) - 0.04),
@@ -213,7 +214,8 @@ SFX = [
     ("tiles", "whoosh", 2.06, 0.2), ("badge1", "pop", 2.26, 0.26), ("pick", "click-soft", 2.42, 0.45),
     ("why", "pop", 4.04, 0.26), ("blur", "whoosh", 4.36, 0.3), ("cut", "click", 5.12, 0.3),
     ("bw", "impact-bass-1", 7.52, 0.2), ("notif", "whoosh-short", 8.04, 0.3), ("buzz", "click", 8.32, 0.34),
-    ("sop-in", "whoosh-short", 9.54, 0.26), ("sop-tile", "pop", 11.62, 0.3),
+    ("sop-c1", "pop", 10.62, 0.2), ("sop-c2", "pop", 11.04, 0.18), ("sop-c3", "pop", 11.28, 0.2),
+    ("sop-fly", "whoosh", 11.74, 0.24), ("sop-land", "click-soft", 12.26, 0.45),
     ("denied", "impact-bass-1", 15.5, 0.2),
     ("weak-tab", "pop", 16.86, 0.22),
     ("slab1", "whoosh-short", 17.92, 0.2), ("x1", "click", 19.06, 0.32),
