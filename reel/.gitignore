@@ -1,3 +1,5 @@
 snapshots/
 .hyperframes/
 .thumbnails/
+_ref/
+.transcode-cache/

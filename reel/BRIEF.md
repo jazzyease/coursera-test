@@ -22,8 +22,13 @@ details. Footage and dialogue are the source of truth — no invented claims or 
 - `transcript.json` — faster-whisper medium.en word timings; word w11 corrected to "Most"
   (large-v3 cross-check, p=0.92).
 - `data/audio-data.json` — per-frame RMS + 8 bands at 25fps (voice envelope).
-- `assets/fonts/` — Archivo variable, Instrument Serif (OFL, Google Fonts).
+- `assets/fonts/` — Archivo upright + italic variable (OFL, Google Fonts).
+- `assets/media/subject.webm` — `hyperframes remove-background` cutout (quality best).
+- `assets/media/bw.mp4`, `assets/media/blur.mp4` — ffmpeg-preprocessed B&W and blur variants.
+- Style references (user-supplied, not shipped): tubetactix, ManavSharma, 123faadkhan,
+  luemmy21 reels.
 
 ## Customizations
 
-- Design spec: `DESIGN.md` ("Case File").
+- v1 "Case File" (cream editorial) was rejected by the user ("nah i dont like it").
+- v2 design spec: `DESIGN.md` ("Creator Punch"), derived from the reference reels.
