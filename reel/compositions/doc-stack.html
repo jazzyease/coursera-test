@@ -108,8 +108,10 @@
           border-radius: 16px;
           background: linear-gradient(160deg, #fbfbf6, #efebe1);
           box-shadow:
-            0 30px 60px rgba(14, 11, 16, 0.42),
-            0 4px 10px rgba(14, 11, 16, 0.25);
+            inset 0 2px 0 rgba(255, 255, 255, 0.95),
+            inset 0 -3px 0 rgba(14, 11, 16, 0.12),
+            0 30px 60px rgba(14, 11, 16, 0.5),
+            0 4px 10px rgba(14, 11, 16, 0.3);
           transform-style: preserve-3d;
         }
         .sh-head {
@@ -172,12 +174,33 @@
           box-shadow: 0 0 34px 10px rgba(230, 245, 74, 0.55);
         }
 
-              </style>
+                /* Backlight halo behind each object; pops it off the footage */
+        #docs-halo {
+          position: absolute;
+          left: -40px;
+          top: 560px;
+          width: 1160px;
+          height: 920px;
+        }
+        .halo {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+        .halo.a {
+          background: radial-gradient(closest-side, rgba(230, 245, 74, 0.42), rgba(230, 245, 74, 0.12) 55%, rgba(230, 245, 74, 0));
+        }
+        .halo.b {
+          background: radial-gradient(closest-side, rgba(255, 46, 63, 0.6), rgba(255, 46, 63, 0.16) 55%, rgba(255, 46, 63, 0));
+          opacity: 0;
+        }
+      </style>
 
       <div id="root" data-composition-id="doc-stack" data-width="1080" data-height="1920">
         <canvas class="fxc" width="1080" height="1920"></canvas>
         <div class="stage">
           <!-- Document stack: "this one document is probably why" -->
+          <div class="halo-wrap" id="docs-halo"><div class="halo a"></div><div class="halo b"></div></div>
           <div class="obj" id="docs">
             <div class="floater">
               <div class="impact" id="docs-impact"></div>
@@ -291,7 +314,9 @@ function makeSheet(i, chosen) {
             });
           }
 
+          const HALO = $("#docs-halo .halo.a");
           function render(t) {
+            HALO.style.opacity = (0.75 + 0.25 * Math.sin(t * 3.1)).toFixed(3);
             FLOATS.forEach((o) => applyFloat(o, t));
             drawMark(clamp01((t - 2.08) / 0.3));
             drawBursts(t);
@@ -303,7 +328,7 @@ function makeSheet(i, chosen) {
           render(0);
 
           // Local time: this scene is mounted at 1.96s.
-          tl.set("#docs", { autoAlpha: 1, z: 0 }, 0);
+          tl.set("#docs, #docs-halo", { autoAlpha: 1, z: 0 }, 0);
           SHEETS.forEach((s, i) => {
             const o = i - 2, k = Math.abs(o);
             tl.set(s, { x: o * 72, y: k * 22 + 1150, z: -k * 30, rotation: o * 40 }, 0);
@@ -326,7 +351,7 @@ function makeSheet(i, chosen) {
           tl.set("#doc-beam", { autoAlpha: 0 }, 2.06);
           tl.to("#sheet-2 .kl", { backgroundColor: "#ff2e3f", duration: 0.08, ease: "none" }, 2.06);
           tl.to("#docs-impact", { keyframes: [{ x: 12 }, { x: -10 }, { x: 7 }, { x: 0 }], duration: 0.16, ease: "none" }, 2.1);
-          tl.to("#docs", { z: 650, autoAlpha: 0, duration: 0.18, ease: "power2.in" }, 2.38);
+          tl.to("#docs, #docs-halo", { z: 650, autoAlpha: 0, duration: 0.18, ease: "power2.in" }, 2.38);
           window.__timelines["doc-stack"] = tl;
         })();
       </script>

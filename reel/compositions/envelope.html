@@ -104,6 +104,9 @@
           inset: 0;
           border-radius: 12px;
           background: #d9d5cc;
+          box-shadow:
+            inset 0 2px 0 rgba(255, 255, 255, 0.7),
+            0 30px 60px rgba(14, 11, 16, 0.55);
         }
         .letter {
           position: absolute;
@@ -149,12 +152,33 @@
           transform-origin: 50% 0%;
         }
 
-              </style>
+                /* Backlight halo behind each object; pops it off the footage */
+        #env-halo {
+          position: absolute;
+          left: 60px;
+          top: 730px;
+          width: 960px;
+          height: 770px;
+        }
+        .halo {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+        .halo.a {
+          background: radial-gradient(closest-side, rgba(230, 245, 74, 0.42), rgba(230, 245, 74, 0.12) 55%, rgba(230, 245, 74, 0));
+        }
+        .halo.b {
+          background: radial-gradient(closest-side, rgba(255, 46, 63, 0.6), rgba(255, 46, 63, 0.16) 55%, rgba(255, 46, 63, 0));
+          opacity: 0;
+        }
+      </style>
 
       <div id="root" data-composition-id="envelope" data-width="1080" data-height="1920">
         <canvas class="fxc" width="1080" height="1920"></canvas>
         <div class="stage">
           <!-- Envelope: "the rejection letter arrives" -->
+          <div class="halo-wrap" id="env-halo"><div class="halo a"></div><div class="halo b"></div></div>
           <div class="obj" id="env">
             <div class="floater">
               <div class="shadow"></div>
@@ -293,7 +317,9 @@ function splatter(cv, seed, cx, cy, color) {
             });
           }
 
+          const HALO = $("#env-halo .halo.a");
           function render(t) {
+            HALO.style.opacity = (0.75 + 0.25 * Math.sin(t * 3.1)).toFixed(3);
             FLOATS.forEach((o) => applyFloat(o, t));
             drawInk(clamp01((t - 1.03) / 0.22));
             drawBursts(t);
@@ -312,13 +338,15 @@ function splatter(cv, seed, cx, cy, color) {
           }
 
           // Local time: this scene is mounted at 8.02s.
-          tl.set("#env", { autoAlpha: 0, x: 520, y: 900, rotation: 38, rotationY: -55 }, 0);
-          tl.to("#env", { autoAlpha: 1, duration: 0.06, ease: "none" }, 0.02);
-          tl.to("#env", { x: 0, y: 0, rotation: 0, rotationY: 0, scale: 0.9, duration: 0.42, ease: "expo.out" }, 0.02);
+          tl.set("#env, #env-halo", { autoAlpha: 0, x: 520, y: 900, rotation: 38, rotationY: -55 }, 0);
+          tl.to("#env, #env-halo", { autoAlpha: 1, duration: 0.06, ease: "none" }, 0.02);
+          tl.to("#env, #env-halo", { x: 0, y: 0, rotation: 0, rotationY: 0, scale: 0.9, duration: 0.42, ease: "expo.out" }, 0.02);
           tl.set("#env-flap", { rotationX: 0, z: 4 }, 0);
           tl.to("#env-flap", { rotationX: 180, z: -3, duration: 0.24, ease: "power2.inOut" }, 0.4);
           tl.set("#env-letter", { y: 0, z: 2 }, 0);
           tl.to("#env-letter", { y: -150, duration: 0.34, ease: "power3.out" }, 0.54);
+          tl.fromTo("#env-halo .halo.b", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1.1, duration: 0.18, ease: "power2.out" }, 1.03);
+          tl.to("#env-halo .halo.b", { opacity: 0.55, scale: 1, duration: 0.5, ease: "power2.inOut" }, 1.03 + 0.18);
           slamStamp("#env-stamp", "#env-impact", 1.03);
           window.__timelines["envelope"] = tl;
         })();

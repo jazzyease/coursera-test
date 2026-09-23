@@ -33,8 +33,27 @@ editorial) was rejected by the user.
 ## Type
 
 - **Archivo Italic** (variable, local woff2): all captions and badges. 900 weight, width
-  118%, uppercase, tracking -0.01em. Line 1 ≈ 80px, line 2 ≈ 108px, hero words up to 156px.
+  118%, uppercase, tracking -0.01em. Line 1 ≈ 80px; accent lines 84–156px (pre-sized to ≤940px).
 - **JetBrains Mono** (bundled): passport machine-readable-zone chevrons only.
+
+### Caption finish (v4, user asked for gradient / glow / 3D depth)
+
+Each word is three stacked layers of the same glyphs:
+1. `::before`: dark tone extrusion (8 stepped em-based shadows down-right, matching the italic)
+   plus a soft drop shadow, for 3D depth.
+2. Face: solid tone colour + two-radius glow + RGB-split shadows (driven by `--rgb`). This is the
+   layer the contrast audit reads.
+3. `::after`: vertical gradient fill clipped to the glyphs, with a moving light sweep (`--shine`).
+
+| Tone  | Gradient (top → bottom)                     | Extrusion |
+| ----- | ------------------------------------------- | --------- |
+| White | `#FFFFFF` → `#F4F4EF` → `#D4D6DF` → `#B3B6C4` (chrome) | `#2B2731` |
+| Lime  | `#FCFFD9` → `#F0FB8A` → `#E6F54A` → `#B5CD10` | `#3F4A04` |
+| Red   | `#FFC2C9` → `#FF6674` → `#FF2E3F` → `#B50B22` | `#4D0610` |
+
+Plus a tone-coloured haze behind each group, a light streak that slices behind each accent
+line (luemmy21), and hero words ("REJECTED", "WHY", "ARRIVES") that flip in from depth with an
+RGB split and overshoot.
 
 ## Layout (1080×1920)
 
@@ -49,6 +68,9 @@ editorial) was rejected by the user.
 - Background dimmed ~40% using the HyperFrames `remove-background` cutout (subject re-laid on
   top), so she stays bright like the references' lit speakers in dark rooms.
 - Red flash: solid Alarm layer between the dimmed plate and the cutout.
+- `#bgfx` canvas, also between plate and cutout (behind her): drifting bokeh for depth throughout,
+  and rotating god rays behind her head during the hook (0.9–1.96s).
+- Hook: opens at 1.34× with a slight roll and whips out in 0.32s, so frame 0 is already moving.
 - B&W and blur moments are ffmpeg-preprocessed variants of the source (`assets/media/`),
   cross-faded as layers. They're deterministic and cheap, with no shader cost.
 
@@ -67,6 +89,8 @@ editorial) was rejected by the user.
     draws on "why".
   - `compositions/envelope.html`: envelope spins in, the flap opens in 3D, the letter slides out,
     and the stamp slams with ink and a shockwave.
+- Each object has a flat backlight halo (lime; switches to red on each stamp) that follows it,
+  plus rim-light edges.
 - Every object floats on layered sines (y / rotX / rotY / rotZ at different frequencies) with a
   sheen that follows the tilt. Canvas FX (ink, shockwave, sparks, marker) use a seeded PRNG and
   are drawn from one GSAP clock `onUpdate`, so every frame is reproducible and seek-safe.
@@ -74,4 +98,4 @@ editorial) was rejected by the user.
 ## Don'ts
 
 - No invented claims, stats, logos or CTAs; only her spoken words appear as text.
-- No emoji, no gradient text, no neon rainbow.
+- No emoji, no neon rainbow. Gradient text is allowed only in the three tone ramps above.

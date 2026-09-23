@@ -103,8 +103,11 @@
           position: absolute;
           inset: -14px -18px;
           border-radius: 24px;
-          background: #1b2340;
-          box-shadow: inset 0 0 0 3px #2a3458;
+          background: linear-gradient(160deg, #2a3458, #1b2340 55%, #141a31);
+          box-shadow:
+            inset 0 0 0 3px #2a3458,
+            inset 0 2px 0 rgba(251, 251, 246, 0.35),
+            0 34px 70px rgba(14, 11, 16, 0.6);
         }
         .pp-cover.z0 {
           transform: translateZ(-8px);
@@ -193,12 +196,33 @@
           font-size: 38px;
         }
 
-              </style>
+                /* Backlight halo behind each object; pops it off the footage */
+        #pp-halo {
+          position: absolute;
+          left: -40px;
+          top: 560px;
+          width: 1160px;
+          height: 920px;
+        }
+        .halo {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+        .halo.a {
+          background: radial-gradient(closest-side, rgba(230, 245, 74, 0.42), rgba(230, 245, 74, 0.12) 55%, rgba(230, 245, 74, 0));
+        }
+        .halo.b {
+          background: radial-gradient(closest-side, rgba(255, 46, 63, 0.6), rgba(255, 46, 63, 0.16) 55%, rgba(255, 46, 63, 0));
+          opacity: 0;
+        }
+      </style>
 
       <div id="root" data-composition-id="passport" data-width="1080" data-height="1920">
         <canvas class="fxc" width="1080" height="1920"></canvas>
         <div class="stage">
           <!-- Passport: "Your visa got rejected" -->
+          <div class="halo-wrap" id="pp-halo"><div class="halo a"></div><div class="halo b"></div></div>
           <div class="obj" id="pp">
             <div class="floater">
               <div class="shadow"></div>
@@ -380,7 +404,9 @@ function splatter(cv, seed, cx, cy, color) {
           }
 
           const foil = $("#pp-foil");
+          const HALO = $("#pp-halo .halo.a");
           function render(t) {
+            HALO.style.opacity = (0.75 + 0.25 * Math.sin(t * 3.1)).toFixed(3);
             FLOATS.forEach((o) => applyFloat(o, t));
             foil.style.background = "conic-gradient(from " + ((t * 160) % 360).toFixed(1) + "deg, #e6f54a, #fbfbf6, #c9cbd3, #fbfbf6, #e6f54a)";
             drawInk(clamp01((t - 0.96) / 0.22));
@@ -399,11 +425,13 @@ function splatter(cv, seed, cx, cy, color) {
             tl.to(impactSel, { scale: 1, z: 0, duration: 0.36, ease: "back.out(2.2)" }, land + 0.05);
           }
 
-          tl.set("#pp", { autoAlpha: 0, y: 420, rotationX: 70, rotationZ: -8, scale: 0.55 }, 0);
-          tl.to("#pp", { autoAlpha: 1, duration: 0.1, ease: "none" }, 0.02);
-          tl.to("#pp", { y: 0, rotationX: 0, rotationZ: 0, scale: 0.86, duration: 0.6, ease: "expo.out" }, 0.02);
+          tl.set("#pp, #pp-halo", { autoAlpha: 0, y: 420, rotationX: 70, rotationZ: -8, scale: 0.55 }, 0);
+          tl.to("#pp, #pp-halo", { autoAlpha: 1, duration: 0.1, ease: "none" }, 0.02);
+          tl.to("#pp, #pp-halo", { y: 0, rotationX: 0, rotationZ: 0, scale: 0.86, duration: 0.6, ease: "expo.out" }, 0.02);
+          tl.fromTo("#pp-halo .halo.b", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1.1, duration: 0.18, ease: "power2.out" }, 0.96);
+          tl.to("#pp-halo .halo.b", { opacity: 0.55, scale: 1, duration: 0.5, ease: "power2.inOut" }, 0.96 + 0.18);
           slamStamp("#pp-stamp", "#pp-impact", 0.96);
-          tl.to("#pp", { x: 820, rotationY: 75, rotationZ: 20, duration: 0.28, ease: "power3.in" }, 1.68);
+          tl.to("#pp, #pp-halo", { x: 820, rotationY: 75, rotationZ: 20, duration: 0.28, ease: "power3.in" }, 1.68);
           window.__timelines["passport"] = tl;
         })();
       </script>
