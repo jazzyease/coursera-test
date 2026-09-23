@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-composition-variables="[
+    {&quot;id&quot;:&quot;label&quot;,&quot;type&quot;:&quot;string&quot;,&quot;label&quot;:&quot;Card label&quot;,&quot;default&quot;:&quot;DOCUMENT&quot;},
+    {&quot;id&quot;:&quot;tilt&quot;,&quot;type&quot;:&quot;number&quot;,&quot;label&quot;:&quot;Resting tilt (deg)&quot;,&quot;default&quot;:4,&quot;min&quot;:-15,&quot;max&quot;:15,&quot;step&quot;:0.5},
+    {&quot;id&quot;:&quot;enterFrom&quot;,&quot;type&quot;:&quot;enum&quot;,&quot;label&quot;:&quot;Enter from&quot;,&quot;default&quot;:&quot;right&quot;,&quot;options&quot;:[{&quot;value&quot;:&quot;right&quot;,&quot;label&quot;:&quot;Right&quot;},{&quot;value&quot;:&quot;bottom&quot;,&quot;label&quot;:&quot;Bottom&quot;}]},
+    {&quot;id&quot;:&quot;ringAt&quot;,&quot;type&quot;:&quot;number&quot;,&quot;label&quot;:&quot;Marker ring at (s, -1 = off)&quot;,&quot;default&quot;:-1,&quot;step&quot;:0.01},
+    {&quot;id&quot;:&quot;stampAt&quot;,&quot;type&quot;:&quot;number&quot;,&quot;label&quot;:&quot;Stamp at (s, -1 = off)&quot;,&quot;default&quot;:-1,&quot;step&quot;:0.01}
+  ]">
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <template>
+      <style>
+        #root {
+          position: absolute;
+          inset: 0;
+          overflow: visible;
+        }
+        .pc-card {
+          position: absolute;
+          inset: 0;
+          border-radius: 4px;
+          background: #f5eee4;
+          box-shadow:
+            0 36px 70px rgba(29, 22, 19, 0.38),
+            0 4px 12px rgba(29, 22, 19, 0.22);
+          padding: 34px 32px;
+          box-sizing: border-box;
+          overflow: visible;
+        }
+        .pc-head {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-family: "IBM Plex Mono", monospace;
+          font-weight: 600;
+          font-size: 21px;
+          letter-spacing: 0.14em;
+          color: #1d1613;
+        }
+        .pc-dot {
+          display: block;
+          width: 12px;
+          height: 12px;
+          background: #b8392a;
+        }
+        .pc-rule {
+          display: block;
+          height: 2px;
+          width: 100%;
+          margin: 18px 0 26px;
+          background: #1d1613;
+          transform-origin: left center;
+        }
+        .pc-lines {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .pc-line {
+          display: block;
+          height: 13px;
+          border-radius: 2px;
+          background: rgba(29, 22, 19, 0.2);
+          transform-origin: left center;
+        }
+        .pc-ring {
+          position: absolute;
+          left: -22px;
+          top: 50px;
+          width: 250px;
+          height: 70px;
+          overflow: visible;
+        }
+        .pc-stamp {
+          position: absolute;
+          right: 18px;
+          bottom: 42px;
+          padding: 12px 20px;
+          border: 6px solid #b8392a;
+          border-radius: 8px;
+          color: #b8392a;
+          font-family: "Archivo Black", sans-serif;
+          font-weight: 400;
+          font-size: 40px;
+          letter-spacing: 0.08em;
+          line-height: 1;
+          opacity: 0;
+        }
+      </style>
+
+      <div data-hf-id="hf-bxdw" id="root" data-composition-id="paper-card" data-width="340" data-height="440">
+        <div data-hf-id="hf-px16" class="pc-card" id="pc-card">
+          <div data-hf-id="hf-85aq" class="pc-head"><span data-hf-id="hf-1fsw" class="pc-dot"></span><span data-hf-id="hf-3fyi" class="pc-label">DOCUMENT</span></div>
+          <span data-hf-id="hf-f69v" class="pc-rule" id="pc-rule"></span>
+          <div data-hf-id="hf-xcru" class="pc-lines" id="pc-lines">
+            <span data-hf-id="hf-b9nb" class="pc-line" style="width: 92%"></span>
+            <span data-hf-id="hf-rv93" class="pc-line" style="width: 78%"></span>
+            <span data-hf-id="hf-58vb" class="pc-line pc-key" style="width: 86%"></span>
+            <span data-hf-id="hf-c1q2" class="pc-line" style="width: 64%"></span>
+            <span data-hf-id="hf-jv3s" class="pc-line" style="width: 88%"></span>
+            <span data-hf-id="hf-ec6r" class="pc-line" style="width: 52%"></span>
+            <svg data-hf-id="hf-cjx9" class="pc-ring" id="pc-ring" viewBox="0 0 250 70" aria-hidden="true">
+              <path data-hf-id="hf-8vkk" id="pc-ring-path" d="M18,38 C20,14 90,6 150,8 C212,10 244,22 238,40 C232,60 160,66 100,64 C44,62 10,54 14,34 C16,24 30,18 44,16" fill="none" stroke="#b8392a" stroke-width="5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div data-hf-id="hf-ir7c" class="pc-stamp" id="pc-stamp">REJECTED</div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          const v = window.__hyperframes.getVariables();
+          const tilt = Number(v.tilt);
+          const fromBottom = v.enterFrom === "bottom";
+          document.querySelector(".pc-label").textContent = String(v.label);
+          const tl = gsap.timeline({ paused: true });
+
+          tl.fromTo(
+            "#pc-card",
+            fromBottom
+              ? { y: 560, x: 0, rotation: tilt - 10, opacity: 1 }
+              : { x: 380, y: 30, rotation: tilt + 14, opacity: 0 },
+            { x: 0, y: 0, rotation: tilt, opacity: 1, duration: 0.62, ease: "expo.out" },
+            0,
+          );
+          tl.fromTo("#pc-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power3.out" }, 0.18);
+          tl.fromTo(
+            "#pc-lines .pc-line",
+            { scaleX: 0 },
+            { scaleX: 1, duration: 0.36, ease: "power2.out", stagger: 0.045 },
+            0.24,
+          );
+
+          // Ring path is ~560 units long; dash draw keeps it seek-safe.
+          const ring = document.getElementById("pc-ring-path");
+          const len = ring.getTotalLength();
+          tl.set(ring, { strokeDasharray: len, strokeDashoffset: len }, 0);
+          if (Number(v.ringAt) >= 0) {
+            tl.to(ring, { strokeDashoffset: 0, duration: 0.42, ease: "power2.inOut" }, Number(v.ringAt));
+            tl.to("#pc-lines .pc-key", { backgroundColor: "rgba(184,57,42,0.55)", duration: 0.2 }, Number(v.ringAt) + 0.25);
+          }
+
+          if (Number(v.stampAt) >= 0) {
+            const s = Number(v.stampAt);
+            tl.fromTo(
+              "#pc-stamp",
+              { scale: 1.9, rotation: -16, opacity: 0 },
+              { scale: 1, rotation: -9, opacity: 1, duration: 0.14, ease: "power4.in" },
+              s,
+            );
+            // Impact: the sheet dips as the stamp lands.
+            tl.to("#pc-card", { scale: 0.975, duration: 0.05, ease: "power2.out" }, s + 0.14);
+            tl.to("#pc-card", { scale: 1, duration: 0.3, ease: "power3.out" }, s + 0.19);
+          }
+
+          window.__timelines["paper-card"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

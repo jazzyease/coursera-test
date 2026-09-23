@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1920">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Archivo";
+        src: url("assets/fonts/Archivo-Variable.woff2") format("woff2");
+        font-weight: 100 900;
+        font-stretch: 62% 125%;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Instrument Serif";
+        src: url("assets/fonts/InstrumentSerif-Italic.woff2") format("woff2");
+        font-weight: 400;
+        font-style: italic;
+      }
+
+      /* DESIGN.md palette */
+      :root {
+        --ink: #1d1613;
+        --paper: #f5eee4;
+        --stamp: #b8392a;
+        --dust: #cdbfae;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--ink);
+      }
+      body {
+        font-family: "Archivo", sans-serif;
+        color: var(--paper);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--ink);
+      }
+
+      /* ---------- Camera: every zoom / pan / reframe lives on #cam ---------- */
+      #cam {
+        position: absolute;
+        inset: 0;
+        transform-origin: 570px 610px; /* subject's face in source pixels */
+      }
+      #a-roll {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Legibility scrim under the caption zone */
+      #scrim {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 980px;
+        background: linear-gradient(
+          to top,
+          rgba(29, 22, 19, 0.5) 0%,
+          rgba(29, 22, 19, 0.5) 40%,
+          rgba(29, 22, 19, 0.46) 62%,
+          rgba(29, 22, 19, 0.28) 82%,
+          rgba(29, 22, 19, 0) 100%
+        );
+        pointer-events: none;
+      }
+
+      /* ---------- Header tag + voice meter ---------- */
+      #hdr {
+        position: absolute;
+        left: 72px;
+        top: 236px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .hdr-row {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .hdr-tag {
+        font-family: "IBM Plex Mono", monospace;
+        font-weight: 600;
+        font-size: 26px;
+        letter-spacing: 0.16em;
+        color: var(--paper);
+        text-shadow: 0 1px 10px rgba(29, 22, 19, 0.7);
+      }
+      .hdr-sq {
+        display: block;
+        width: 14px;
+        height: 14px;
+        background: var(--stamp);
+      }
+      #meter {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        height: 26px;
+      }
+      .mb {
+        display: block;
+        width: 5px;
+        height: 26px;
+        border-radius: 2px;
+        background: var(--paper);
+        transform-origin: center center;
+        box-shadow: 0 0 8px rgba(29, 22, 19, 0.5);
+      }
+      .hdr-track {
+        position: relative;
+        display: block;
+        width: 212px;
+        height: 3px;
+        background: rgba(245, 238, 228, 0.35);
+      }
+      #hdr-prog {
+        position: absolute;
+        left: 0;
+        top: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: var(--paper);
+        transform-origin: left center;
+      }
+
+      /* ---------- Paper-card slots (reusable sub-composition) ---------- */
+      .card-wrap {
+        position: absolute;
+        left: 690px;
+        top: 660px;
+        width: 340px;
+        height: 440px;
+        transform-origin: 50% 50%;
+      }
+
+      /* ---------- Captions ---------- */
+      #captions {
+        position: absolute;
+        left: 0;
+        top: 1160px;
+        width: 1080px;
+        height: 330px;
+        overflow: visible;
+      }
+      .cg {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        opacity: 0;
+      }
+      .cl {
+        display: block;
+        max-width: 900px;
+        text-align: center;
+        white-space: nowrap;
+        line-height: 1.04;
+      }
+      .w {
+        display: inline-block;
+        margin: 0 0.11em;
+        font-weight: 800;
+        font-stretch: 108%;
+        font-size: 84px;
+        letter-spacing: -0.02em;
+        color: var(--paper);
+        text-shadow:
+          0 2px 20px rgba(29, 22, 19, 0.55),
+          0 1px 3px rgba(29, 22, 19, 0.6);
+        transform-origin: 50% 80%;
+      }
+      .w.serif,
+      .w.serif-l,
+      .w.serif-xl {
+        font-family: "Instrument Serif", serif;
+        font-style: italic;
+        font-weight: 400;
+        font-stretch: 100%;
+        letter-spacing: -0.01em;
+        /* thin serif strokes need a denser halo over the white tee */
+        text-shadow:
+          0 0 28px rgba(29, 22, 19, 0.75),
+          0 2px 6px rgba(29, 22, 19, 0.7);
+      }
+      .w.serif {
+        font-size: 112px;
+      }
+      .w.serif-l {
+        font-size: 124px;
+      }
+      .w.serif-xl {
+        font-size: 164px;
+        line-height: 0.9;
+      }
+      .w.stamp {
+        position: relative;
+        margin-top: 14px;
+        padding: 14px 34px 12px;
+        border-radius: 10px;
+        background: var(--stamp);
+        font-weight: 900;
+        font-stretch: 125%;
+        font-size: 96px;
+        letter-spacing: 0.06em;
+        text-shadow: none;
+        box-shadow: 0 18px 40px rgba(29, 22, 19, 0.35);
+      }
+      .w.stamp::after {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        border: 3px solid rgba(245, 238, 228, 0.7);
+        border-radius: 5px;
+      }
+      .w.underline {
+        position: relative;
+      }
+      .uline {
+        position: absolute;
+        left: -4px;
+        right: -4px;
+        bottom: 2px;
+        display: block;
+        height: 12px;
+        background: var(--stamp);
+        transform-origin: left center;
+        z-index: -1;
+      }
+      .w.kinetic {
+        font-size: 120px;
+      }
+      .mask {
+        display: inline-block;
+        overflow: hidden;
+        padding: 6px 12px 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-a2ka" id="root" data-composition-id="main" data-start="0" data-duration="10.12" data-width="1080" data-height="1920">
+      <div data-hf-id="hf-ftaq" id="cam">
+        <video data-hf-id="hf-f8ix" id="a-roll" class="clip" src="prachi-original-first-10s.mp4" muted playsinline data-start="0" data-duration="10.12" data-track-index="0"></video>
+      </div>
+      <audio data-hf-id="hf-b3o6" id="a-roll-audio" src="prachi-original-first-10s.mp4" data-start="0" data-duration="10.12" data-track-index="2" data-volume="1"></audio>
+      <!-- Finishing SFX, kept well under the voice: stamp thuds + card moves -->
+      <audio data-hf-id="hf-wcsk" id="sfx-stamp-1" src="assets/sfx/impact-bass-1.mp3" data-start="0.93" data-duration="0.9" data-track-index="6" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-4u2v" id="sfx-card-in" src="assets/sfx/whoosh-short.mp3" data-start="1.94" data-duration="0.57" data-track-index="7" data-volume="0.22"></audio>
+      <audio data-hf-id="hf-3vzw" id="sfx-card-out" src="assets/sfx/whoosh-short.mp3" data-start="4.42" data-duration="0.57" data-track-index="7" data-volume="0.2"></audio>
+      <audio data-hf-id="hf-hp87" id="sfx-letter-in" src="assets/sfx/whoosh-short.mp3" data-start="8.12" data-duration="0.57" data-track-index="7" data-volume="0.18"></audio>
+      <audio data-hf-id="hf-e3eu" id="sfx-stamp-2" src="assets/sfx/impact-bass-1.mp3" data-start="9.0" data-duration="0.9" data-track-index="6" data-volume="0.1"></audio>
+
+      <div data-hf-id="hf-wmg9" id="scrim"></div>
+
+      <div data-hf-id="hf-421t" id="hdr">
+        <div data-hf-id="hf-zfmp" class="hdr-row">
+          <span data-hf-id="hf-4kc2" class="hdr-sq"></span>
+          <span data-hf-id="hf-6zfw" class="hdr-tag">VISA REJECTION</span>
+          <div data-hf-id="hf-x2n0" id="meter">
+            <span data-hf-id="hf-q4ys" class="mb"></span><span data-hf-id="hf-65i4" class="mb"></span><span data-hf-id="hf-4yl1" class="mb"></span><span data-hf-id="hf-5cw2" class="mb"></span><span data-hf-id="hf-7cf7" class="mb"></span>
+          </div>
+        </div>
+        <span data-hf-id="hf-0p8r" class="hdr-track"><span data-hf-id="hf-1svp" id="hdr-prog"></span></span>
+      </div>
+
+      <!-- "this one document" -->
+      <div data-hf-id="hf-7f62" class="card-wrap" id="doc-wrap">
+        <div data-hf-id="hf-ltzk" id="doc-card" data-composition-id="doc-card" data-composition-src="compositions/paper-card.html" data-variable-values="{&quot;label&quot;:&quot;DOCUMENT&quot;,&quot;tilt&quot;:5,&quot;enterFrom&quot;:&quot;right&quot;,&quot;ringAt&quot;:1.62}" data-start="1.96" data-duration="2.94" data-track-index="3" data-width="340" data-height="440"></div>
+      </div>
+
+      <!-- "the rejection letter arrives" -->
+      <div data-hf-id="hf-8f1m" class="card-wrap" id="letter-wrap">
+        <div data-hf-id="hf-it5y" id="letter-card" data-composition-id="letter-card" data-composition-src="compositions/paper-card.html" data-variable-values="{&quot;label&quot;:&quot;LETTER&quot;,&quot;tilt&quot;:-4,&quot;enterFrom&quot;:&quot;bottom&quot;,&quot;stampAt&quot;:0.72}" data-start="8.16" data-duration="1.96" data-track-index="4" data-width="340" data-height="440"></div>
+      </div>
+
+      <div data-hf-id="hf-v35y" id="captions" class="clip" data-start="0" data-duration="10.12" data-track-index="5"></div>
+    </div>
+
+    <script>
+      // Word timings: faster-whisper medium.en (w11 corrected to "Most" via large-v3).
+      const WORDS = [
+        { text: "Your", start: 0.0, end: 0.32 },
+        { text: "visa", start: 0.32, end: 0.62 },
+        { text: "got", start: 0.62, end: 0.92 },
+        { text: "rejected,", start: 0.92, end: 1.48 },
+        { text: "and", start: 2.06, end: 2.16 },
+        { text: "this", start: 2.16, end: 2.34 },
+        { text: "one", start: 2.34, end: 2.64 },
+        { text: "document", start: 2.64, end: 3.14 },
+        { text: "is", start: 3.14, end: 3.54 },
+        { text: "probably", start: 3.54, end: 4.04 },
+        { text: "why.", start: 4.04, end: 4.44 },
+        { text: "Most", start: 5.18, end: 5.4 },
+        { text: "students", start: 5.4, end: 5.84 },
+        { text: "only", start: 5.84, end: 6.22 },
+        { text: "find", start: 6.22, end: 6.52 },
+        { text: "out", start: 6.52, end: 6.86 },
+        { text: "after", start: 6.86, end: 7.36 },
+        { text: "the", start: 7.36, end: 7.58 },
+        { text: "rejection", start: 7.58, end: 7.94 },
+        { text: "letter", start: 7.94, end: 8.32 },
+        { text: "arrives.", start: 8.32, end: 8.82 },
+      ];
+
+      // Phrase groups: lines of word indices + per-word emphasis style.
+      const GROUPS = [
+        { start: 0.0, end: 1.8, lines: [[0, 1, 2], [3]], style: { 3: "stamp" }, label: { 3: "REJECTED" } },
+        { start: 1.98, end: 3.12, lines: [[4, 5, 6], [7]], style: { 7: "serif-xl" } },
+        { start: 3.12, end: 4.62, lines: [[8, 9, 10]], style: { 10: "serif" } },
+        { start: 5.08, end: 6.86, lines: [[11, 12], [13, 14, 15]], style: { 13: "underline" } },
+        { start: 6.86, end: 8.3, lines: [[16, 17], [18, 19]], style: { 18: "serif-l", 19: "serif-l" } },
+        { start: 8.3, end: 9.1, lines: [[20]], style: { 20: "kinetic" } },
+      ];
+
+      // Voice RMS per frame @25fps (data/audio-data.json), normalised 0..1.
+      const FPS = 25;
+      const RMS = [0.0,0.0,0.04,0.42,0.5,0.67,0.54,0.2,0.21,0.5,0.64,0.63,0.44,0.19,0.43,0.78,0.54,0.21,0.3,0.65,0.72,0.66,0.16,0.07,0.27,0.37,0.38,0.19,0.44,0.42,0.2,0.01,0.0,0.0,0.08,0.23,0.19,0.11,0.07,0.03,0.02,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.32,0.54,0.47,0.64,0.51,0.41,0.46,0.2,0.12,0.09,0.35,0.29,0.62,0.79,0.66,0.34,0.27,0.25,0.55,0.87,0.65,0.03,0.07,0.08,0.58,0.4,0.48,0.48,0.45,0.38,0.36,0.14,0.04,0.03,0.0,0.0,0.42,0.38,0.19,0.05,0.0,0.06,0.65,0.65,0.33,0.3,0.34,0.3,0.33,0.3,0.37,0.42,0.43,0.31,0.23,0.37,0.46,0.33,0.17,0.08,0.04,0.04,0.02,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.3,0.39,0.6,0.82,0.48,0.2,0.09,0.16,0.78,0.73,0.64,0.49,0.44,0.57,0.36,0.43,0.49,0.19,0.11,0.09,0.43,0.54,0.46,0.37,0.34,0.75,0.69,0.16,0.08,0.24,0.77,0.58,0.47,0.49,0.49,0.42,0.62,0.61,0.57,0.18,0.06,0.03,0.0,0.0,0.0,0.65,0.93,1.0,0.8,0.18,0.07,0.06,0.02,0.08,0.45,0.42,0.14,0.48,0.43,0.42,0.45,0.39,0.25,0.63,0.47,0.11,0.16,0.16,0.15,0.48,0.51,0.47,0.53,0.55,0.16,0.01,0.29,0.33,0.29,0.19,0.45,0.42,0.27,0.4,0.29,0.17,0.16,0.13,0.08,0.07,0.08,0.06,0.08,0.08,0.04,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.01,0.04,0.08,0.1,0.08,0.06,0.04,0.02,0.01,0.01,0.0,0.0];
+      const rmsAt = (t) => RMS[Math.max(0, Math.min(RMS.length - 1, Math.round(t * FPS)))] || 0;
+
+      const LEAD = 0.05; // captions land a hair before the syllable
+      const tl = gsap.timeline({ paused: true });
+
+      // ---------- Reusable pieces ----------
+      function camTo(vars, at, duration, ease) {
+        tl.to("#cam", { ...vars, duration, ease }, at);
+      }
+      function punch(at, scale, settleScale, settleAt, settleDur) {
+        tl.to("#cam", { scale, duration: 0.14, ease: "expo.out" }, at);
+        tl.to("#cam", { scale: settleScale, duration: settleDur, ease: "power2.out" }, settleAt);
+      }
+      function shake(at, amp) {
+        // Three-frame impact jolt, deterministic.
+        const f = 1 / FPS;
+        tl.to("#cam", { y: amp, x: "+=" + amp * 0.5, duration: f, ease: "none" }, at);
+        tl.to("#cam", { y: -amp * 0.6, x: "-=" + amp, duration: f, ease: "none" }, at + f);
+        tl.to("#cam", { y: 0, x: "+=" + amp * 0.5, duration: f * 2, ease: "power1.out" }, at + 2 * f);
+      }
+
+      function buildGroup(g, gi) {
+        const el = document.createElement("div");
+        el.className = "cg";
+        el.id = "cg-" + gi;
+        g.lines.forEach((line) => {
+          const lineEl = document.createElement("div");
+          lineEl.className = "cl";
+          line.forEach((wi) => {
+            const style = g.style[wi] || "";
+            const span = document.createElement("span");
+            span.className = "w " + style;
+            span.id = "w-" + wi;
+            span.textContent = (g.label && g.label[wi]) || WORDS[wi].text;
+            if (style === "underline") {
+              const u = document.createElement("span");
+              u.className = "uline";
+              u.id = "u-" + wi;
+              span.appendChild(u);
+            }
+            if (style === "kinetic") {
+              const m = document.createElement("span");
+              m.className = "mask";
+              m.appendChild(span);
+              lineEl.appendChild(m);
+            } else {
+              lineEl.appendChild(span);
+            }
+          });
+          el.appendChild(lineEl);
+        });
+        document.getElementById("captions").appendChild(el);
+        return el;
+      }
+
+      function animateWord(wi, style) {
+        const t = Math.max(0, WORDS[wi].start - LEAD);
+        const sel = "#w-" + wi;
+        const lift = 1 + Math.min(0.03, rmsAt(WORDS[wi].start + 0.08) * 0.03);
+        if (WORDS[wi].start < 0.9) {
+          // Hook line "Your visa got" is on screen from frame 0 so the first frame reads; the stamp stays on-beat.
+          tl.set(sel, { opacity: 1, y: 0, scale: 1 }, 0);
+          return;
+        }
+        if (style === "stamp") {
+          tl.fromTo(
+            sel,
+            { opacity: 0, scale: 1.7, rotation: -9 },
+            { opacity: 1, scale: 1, rotation: -3, duration: 0.13, ease: "power4.in" },
+            WORDS[wi].start - 0.1,
+          );
+          return;
+        }
+        if (style.startsWith("serif")) {
+          tl.fromTo(
+            sel,
+            { opacity: 0, y: 34, clipPath: "inset(0% 0% 100% 0%)" },
+            { opacity: 1, y: 0, clipPath: "inset(0% 0% -20% 0%)", duration: 0.42, ease: "expo.out" },
+            t,
+          );
+          return;
+        }
+        if (style === "kinetic") {
+          tl.fromTo(sel, { yPercent: 110 }, { yPercent: 0, duration: 0.4, ease: "expo.out" }, t);
+          return;
+        }
+        tl.fromTo(
+          sel,
+          { opacity: 0, y: 22, scale: 0.96 },
+          { opacity: 1, y: 0, scale: lift, duration: 0.24, ease: "power3.out" },
+          t,
+        );
+        tl.to(sel, { scale: 1, duration: 0.3, ease: "sine.out" }, t + 0.24);
+        if (style === "underline") {
+          tl.fromTo("#u-" + wi, { scaleX: 0 }, { scaleX: 1, duration: 0.34, ease: "expo.out" }, t + 0.08);
+        }
+      }
+
+      // ---------- Captions ----------
+      GROUPS.forEach((g, gi) => {
+        const el = buildGroup(g, gi);
+        tl.set(el, { opacity: 1, visibility: "visible", y: 0 }, Math.max(0, g.start - LEAD - 0.01));
+        g.lines.flat().forEach((wi) => animateWord(wi, g.style[wi] || ""));
+        tl.to(el, { opacity: 0, y: -14, duration: 0.14, ease: "power2.in" }, g.end - 0.14);
+        tl.set(el, { opacity: 0, visibility: "hidden" }, g.end);
+      });
+      tl.set("#cg-0", { opacity: 1 }, 0);
+
+      // ---------- Camera: punches on stressed syllables, drifts between ----------
+      tl.set("#cam", { scale: 1.14, x: 0, y: 0 }, 0);
+      camTo({ scale: 1.18 }, 0, 0.9, "none");
+      punch(0.9, 1.3, 1.22, 1.06, 0.8); // "rejected"
+      shake(0.9, 7);
+      camTo({ scale: 1.22, x: -110 }, 1.9, 0.62, "power3.inOut"); // reframe left for the document card
+      camTo({ scale: 1.26 }, 2.52, 1.5, "none");
+      punch(4.02, 1.32, 1.28, 4.16, 0.3); // "why"
+      camTo({ scale: 1.03, x: 0 }, 4.5, 0.72, "power3.inOut"); // breath: back to the room
+      camTo({ scale: 1.1 }, 5.22, 2.34, "none");
+      punch(7.56, 1.2, 1.2, 7.7, 0.3); // "rejection"
+      camTo({ scale: 1.22, x: -100 }, 8.1, 0.7, "power3.inOut"); // make room for the letter
+      camTo({ scale: 1.25 }, 8.8, 1.32, "none");
+
+      // ---------- Card slot choreography (host side) ----------
+      tl.set("#doc-wrap", { scale: 0.88, x: 0, opacity: 1 }, 0);
+      tl.to("#doc-wrap", { x: 460, rotation: 14, opacity: 0, duration: 0.42, ease: "power3.in" }, 4.44);
+      tl.set("#letter-wrap", { scale: 0.88, y: 0 }, 0);
+
+      // ---------- Header: entrance, progress, voice meter ----------
+      tl.set("#hdr", { opacity: 1, x: 0 }, 0);
+      tl.fromTo("#hdr-prog", { scaleX: 0 }, { scaleX: 1, duration: 10.12, ease: "none" }, 0);
+      const WEIGHTS = [0.55, 0.85, 1, 0.8, 0.5];
+      document.querySelectorAll("#meter .mb").forEach((bar, bi) => {
+        const frames = [];
+        for (let f = 0; f < RMS.length; f += 2) {
+          const r = RMS[Math.max(0, f - bi)] * 0.65 + RMS[Math.min(RMS.length - 1, f + bi)] * 0.35;
+          frames.push({ scaleY: 0.18 + 0.82 * r * WEIGHTS[bi], duration: 2 / FPS });
+        }
+        tl.set(bar, { scaleY: 0.18 }, 0);
+        tl.to(bar, { keyframes: frames, ease: "none" }, 0);
+      });
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
