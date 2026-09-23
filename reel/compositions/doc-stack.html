@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+
+        @font-face {
+          font-family: "Archivo";
+          src: url("assets/fonts/Archivo-Italic-Variable.woff2") format("woff2");
+          font-weight: 100 900;
+          font-stretch: 62% 125%;
+          font-style: italic;
+        }
+        #root {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+        .stage {
+          position: absolute;
+          inset: 0;
+          perspective: 1500px;
+          perspective-origin: 50% 900px;
+        }
+        .obj,
+        .floater,
+        .impact {
+          position: absolute;
+          transform-style: preserve-3d;
+        }
+        .floater,
+        .impact {
+          inset: 0;
+        }
+        .shadow {
+          position: absolute;
+          left: -60px;
+          right: -60px;
+          top: 40px;
+          bottom: -80px;
+          background: radial-gradient(ellipse 50% 45% at 50% 55%, rgba(14, 11, 16, 0.6), rgba(14, 11, 16, 0) 72%);
+          transform: translateZ(-70px);
+        }
+        .sheen {
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: linear-gradient(115deg, rgba(251, 251, 246, 0) 30%, rgba(251, 251, 246, 0.85) 50%, rgba(251, 251, 246, 0) 70%);
+          background-size: 260% 100%;
+          mix-blend-mode: soft-light;
+          opacity: 0.2;
+        }
+        canvas.fill {
+          position: absolute;
+          left: 0;
+          top: 0;
+        }
+        .ln {
+          position: absolute;
+          left: 26px;
+          height: 12px;
+          border-radius: 6px;
+          background: #c9cbd3;
+        }
+        .stamp {
+          position: absolute;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 7px solid #ff2e3f;
+          border-radius: 14px;
+          box-sizing: border-box;
+          color: #ff2e3f;
+          font-family: "Archivo", sans-serif;
+          font-style: italic;
+          font-weight: 900;
+          font-stretch: 118%;
+          line-height: 1;
+          mix-blend-mode: multiply;
+          -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+        }
+
+        .fxc {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 1080px;
+          height: 1920px;
+        }
+      /* ---------- Document stack ---------- */
+        #docs {
+          left: 220px;
+          top: 800px;
+          width: 640px;
+          height: 440px;
+        }
+        .sheet {
+          position: absolute;
+          left: 185px;
+          top: 12px;
+          width: 270px;
+          height: 365px;
+          border-radius: 16px;
+          background: linear-gradient(160deg, #fbfbf6, #efebe1);
+          box-shadow:
+            0 30px 60px rgba(14, 11, 16, 0.42),
+            0 4px 10px rgba(14, 11, 16, 0.25);
+          transform-style: preserve-3d;
+        }
+        .sh-head {
+          position: absolute;
+          left: 26px;
+          top: 28px;
+          width: 120px;
+          height: 16px;
+          border-radius: 8px;
+          background: #0e0b10;
+        }
+        .sh-dot {
+          position: absolute;
+          right: 26px;
+          top: 22px;
+          width: 30px;
+          height: 30px;
+          border-radius: 8px;
+          background: #e6f54a;
+          box-shadow: inset 0 0 0 3px #0e0b10;
+        }
+        .sig {
+          position: absolute;
+          left: 24px;
+          bottom: 22px;
+          width: 150px;
+          height: 46px;
+        }
+        .glint-wrap {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          border-radius: 16px;
+        }
+        .glint {
+          position: absolute;
+          top: -20%;
+          bottom: -20%;
+          left: 0;
+          width: 45%;
+          background: linear-gradient(100deg, rgba(251, 251, 246, 0), rgba(251, 251, 246, 0.9), rgba(251, 251, 246, 0));
+        }
+        .outline {
+          position: absolute;
+          inset: -9px;
+          border-radius: 22px;
+          box-shadow:
+            0 0 0 6px #e6f54a,
+            0 0 48px 6px rgba(230, 245, 74, 0.65);
+          opacity: 0;
+        }
+        .beam {
+          position: absolute;
+          left: -18px;
+          right: -18px;
+          top: 18px;
+          height: 8px;
+          border-radius: 4px;
+          background: #e6f54a;
+          box-shadow: 0 0 34px 10px rgba(230, 245, 74, 0.55);
+        }
+
+              </style>
+
+      <div id="root" data-composition-id="doc-stack" data-width="1080" data-height="1920">
+        <canvas class="fxc" width="1080" height="1920"></canvas>
+        <div class="stage">
+          <!-- Document stack: "this one document is probably why" -->
+          <div class="obj" id="docs">
+            <div class="floater">
+              <div class="impact" id="docs-impact"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          const $ = (s) => document.querySelector(s);
+          const $$ = (s) => Array.from(document.querySelectorAll(s));
+          const clamp01 = (x) => Math.min(1, Math.max(0, x));
+          const easeOut = (x) => 1 - Math.pow(1 - clamp01(x), 3);
+          // Seeded PRNG (mulberry32): every "random" detail is identical on every frame and every render.
+          function rng(seed) {
+            let a = seed >>> 0;
+            return () => {
+              a = (a + 0x6d2b79f5) | 0;
+              let t = Math.imul(a ^ (a >>> 15), 1 | a);
+              t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+              return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+          }
+
+          function marker(cv, seed, cx, cy, rx, ry) {
+            const r = rng(seed), c = cv.getContext("2d"), pts = [], N = 140;
+            for (let i = 0; i <= N; i++) {
+              const th = -0.5 + (i / N) * Math.PI * 2 * 1.12, j = 1 + (r() - 0.5) * 0.04;
+              pts.push([cx + Math.cos(th) * rx * j * (1 + (i / N) * 0.07), cy + Math.sin(th) * ry * j]);
+            }
+            return (p) => {
+              c.clearRect(0, 0, cv.width, cv.height);
+              if (p <= 0) return;
+              const n = Math.max(1, Math.floor(easeOut(p) * N));
+              c.strokeStyle = "#ff2e3f";
+              c.lineWidth = 7;
+              c.lineCap = "round";
+              c.lineJoin = "round";
+              c.beginPath();
+              c.moveTo(pts[0][0], pts[0][1]);
+              for (let i = 1; i <= n; i++) c.lineTo(pts[i][0], pts[i][1]);
+              c.stroke();
+            };
+          }
+function makeSheet(i, chosen) {
+            const s = document.createElement("div");
+            s.className = "sheet" + (chosen ? " chosen" : "");
+            s.id = "sheet-" + i;
+            const widths = [222, 188, 212, 170, 218, 150, 200, 178];
+            let html = '<div class="sh-head"></div><div class="sh-dot"></div>';
+            widths.forEach((w, li) => {
+              html += '<span class="ln' + (chosen && li === 4 ? " kl" : "") + '" style="top:' + (76 + li * 26) + "px;width:" + w + 'px"></span>';
+            });
+            html += '<svg class="sig" viewBox="0 0 150 46"><path d="M4 34 C18 6 26 44 40 22 S62 10 70 30 S96 40 104 18 S128 26 146 20" fill="none" stroke="#0e0b10" stroke-width="3" stroke-linecap="round"/></svg>';
+            if (chosen) {
+              html += '<canvas class="fill" id="doc-mark" width="270" height="365"></canvas>';
+              html += '<div class="glint-wrap"><div class="glint" id="doc-glint"></div><div class="beam" id="doc-beam"></div></div>';
+              html += '<div class="outline" id="doc-outline"></div><div class="sheen" style="border-radius:16px"></div>';
+            }
+            s.innerHTML = html;
+            $("#docs-impact").appendChild(s);
+            return s;
+          }
+
+          // ---------- Build ----------
+          const SHEETS = [0, 1, 2, 3, 4].map((i) => makeSheet(i, i === 2));
+          const drawMark = marker($("#doc-mark"), 5, 135, 186, 132, 24);
+          const g = document.querySelector(".fxc").getContext("2d");
+          const BURSTS = [{ at: 2.1, x: 540, y: 1005, spark: "#e6f54a", seed: 9 }];
+          function drawBursts(t) {
+            g.clearRect(0, 0, 1080, 1920);
+            for (const b of BURSTS) {
+              const p = (t - b.at) / 0.42;
+              if (p < 0 || p > 1) continue;
+              const e = easeOut(p), r = rng(b.seed);
+              g.globalAlpha = 1 - p;
+              g.strokeStyle = "#fbfbf6";
+              g.lineWidth = 12 * (1 - p) + 1;
+              g.beginPath();
+              g.arc(b.x, b.y, 50 + e * 320, 0, Math.PI * 2);
+              g.stroke();
+              g.lineCap = "round";
+              for (let i = 0; i < 18; i++) {
+                const a = (i / 18) * Math.PI * 2 + r() * 0.3;
+                const d0 = 70 + e * 250 * (0.7 + r() * 0.6), len = 46 * (1 - p) + 6;
+                g.strokeStyle = i % 3 ? "#ff2e3f" : b.spark;
+                g.lineWidth = 6 * (1 - p) + 1;
+                g.beginPath();
+                g.moveTo(b.x + Math.cos(a) * d0, b.y + Math.sin(a) * d0);
+                g.lineTo(b.x + Math.cos(a) * (d0 + len), b.y + Math.sin(a) * (d0 + len));
+                g.stroke();
+              }
+            }
+            g.globalAlpha = 1;
+          }
+
+          
+          const FLOATS = [{ el: $("#docs .floater"), sheens: $$("#docs .sheen"), base: [6, 0, 0], amp: [9, 3, 6, 1.2], f: 0.6, ph: 1.3 }];
+          function applyFloat(o, t) {
+            const w = 2 * Math.PI * o.f;
+            const y = o.amp[0] * Math.sin(w * t + o.ph);
+            const rx = o.base[0] + o.amp[1] * Math.sin(w * 0.8 * t + o.ph + 1);
+            const sy = Math.sin(w * 0.63 * t + o.ph + 2);
+            const ry = o.base[1] + o.amp[2] * sy;
+            const rz = o.base[2] + o.amp[3] * Math.sin(w * 0.47 * t + o.ph);
+            o.el.style.transform = "translate3d(0," + y.toFixed(2) + "px,0) rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg) rotateZ(" + rz.toFixed(2) + "deg)";
+            o.sheens.forEach((s) => {
+              s.style.opacity = (0.22 + 0.2 * sy).toFixed(3);
+              s.style.backgroundPosition = (50 + ry * 5).toFixed(1) + "% 50%";
+            });
+          }
+
+          function render(t) {
+            FLOATS.forEach((o) => applyFloat(o, t));
+            drawMark(clamp01((t - 2.08) / 0.3));
+            drawBursts(t);
+          }
+
+          const tl = gsap.timeline({ paused: true });
+          const clock = { t: 0 };
+          tl.to(clock, { t: 2.6, duration: 2.6, ease: "none", onUpdate: () => render(clock.t) }, 0);
+          render(0);
+
+          // Local time: this scene is mounted at 1.96s.
+          tl.set("#docs", { autoAlpha: 1, z: 0 }, 0);
+          SHEETS.forEach((s, i) => {
+            const o = i - 2, k = Math.abs(o);
+            tl.set(s, { x: o * 72, y: k * 22 + 1150, z: -k * 30, rotation: o * 40 }, 0);
+            tl.to(s, { y: k * 22, rotation: o * 13, duration: 0.42, ease: "expo.out" }, 0.02 + k * 0.035);
+            if (o === 0) {
+              tl.to(s, { z: 110, y: -6, scale: 1, duration: 0.42, ease: "back.out(1.6)" }, 0.36);
+            } else {
+              tl.to(s, { y: "+=1350", rotation: o * 60, rotationX: 55, duration: 0.5, ease: "power2.in" }, 0.34 + (2 - k) * 0.04);
+              tl.set(s, { autoAlpha: 0 }, 0.84 + (2 - k) * 0.04);
+            }
+          });
+          tl.set("#doc-glint", { xPercent: -160, autoAlpha: 0 }, 0);
+          tl.set("#doc-glint", { autoAlpha: 1 }, 0.66);
+          tl.to("#doc-glint", { xPercent: 330, duration: 0.5, ease: "power2.inOut" }, 0.66);
+          tl.set("#doc-glint", { autoAlpha: 0 }, 1.16);
+          tl.to("#doc-outline", { opacity: 1, duration: 0.16, ease: "power2.out" }, 0.68);
+          tl.set("#doc-beam", { autoAlpha: 0, y: 0 }, 0);
+          tl.set("#doc-beam", { autoAlpha: 1 }, 1.54);
+          tl.to("#doc-beam", { y: 325, duration: 0.5, ease: "power1.inOut" }, 1.56);
+          tl.set("#doc-beam", { autoAlpha: 0 }, 2.06);
+          tl.to("#sheet-2 .kl", { backgroundColor: "#ff2e3f", duration: 0.08, ease: "none" }, 2.06);
+          tl.to("#docs-impact", { keyframes: [{ x: 12 }, { x: -10 }, { x: 7 }, { x: 0 }], duration: 0.16, ease: "none" }, 2.1);
+          tl.to("#docs", { z: 650, autoAlpha: 0, duration: 0.18, ease: "power2.in" }, 2.38);
+          window.__timelines["doc-stack"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>
