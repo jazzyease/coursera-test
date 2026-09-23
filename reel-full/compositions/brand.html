@@ -1,0 +1,118 @@
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"name","type":"string","label":"Brand name (as spoken)","default":"Work Abroad Consultancy"},
+    {"id":"offer","type":"string","label":"Offer (as spoken)","default":"Free SOP reviews"},
+    {"id":"when","type":"string","label":"When (as spoken)","default":"This month"},
+    {"id":"offerAt","type":"number","label":"Offer tag appears (local s)","default":1.5,"step":0.01},
+    {"id":"outAt","type":"number","label":"Exit (local s)","default":3.4,"step":0.01}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        @font-face {
+          font-family: "Archivo";
+          src: url("assets/fonts/Archivo-Variable.woff2") format("woff2");
+          font-weight: 100 900;
+          font-stretch: 62% 125%;
+          font-style: normal;
+        }
+        #root {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+        /* Text-only lower third: no logo is invented for the brand. */
+        .card {
+          position: absolute;
+          left: 170px;
+          top: 900px;
+          width: 740px;
+          padding: 28px 36px 30px 44px;
+          box-sizing: border-box;
+          border-radius: 18px;
+          background: linear-gradient(180deg, #fbfbf6, #efebe1);
+          box-shadow:
+            inset 0 1px 0 #ffffff,
+            0 24px 50px rgba(14, 11, 16, 0.5),
+            0 3px 8px rgba(14, 11, 16, 0.3);
+          overflow: hidden;
+        }
+        .bar {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 10px;
+          background: #1c2442;
+          transform-origin: top center;
+        }
+        .name {
+          font-family: "Archivo", sans-serif;
+          font-weight: 800;
+          font-stretch: 104%;
+          font-size: 50px;
+          letter-spacing: -0.01em;
+          line-height: 1.05;
+          color: #1c2442;
+        }
+        .row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-top: 16px;
+        }
+        .tag {
+          padding: 8px 16px 9px;
+          border-radius: 999px;
+          background: #1c2442;
+          color: #e6f54a;
+          font-family: "Archivo", sans-serif;
+          font-weight: 800;
+          font-stretch: 110%;
+          font-size: 26px;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+        .when {
+          font-family: "Archivo", sans-serif;
+          font-weight: 600;
+          font-size: 28px;
+          color: #4a4f5e;
+        }
+      </style>
+
+      <div id="root" data-composition-id="brand" data-width="1080" data-height="1920">
+        <div class="card" id="card">
+          <span class="bar" id="bar"></span>
+          <div class="name" id="name">Work Abroad Consultancy</div>
+          <div class="row" id="row">
+            <span class="tag" id="offer">Free SOP reviews</span>
+            <span class="when" id="when">This month</span>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          const v = window.__hyperframes.getVariables();
+          document.getElementById("name").textContent = String(v.name);
+          document.getElementById("offer").textContent = String(v.offer);
+          document.getElementById("when").textContent = String(v.when);
+          const tl = gsap.timeline({ paused: true });
+          tl.fromTo("#card", { opacity: 0, y: 40, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power3.out" }, 0.02);
+          tl.fromTo("#bar", { scaleY: 0 }, { scaleY: 1, duration: 0.4, ease: "power3.out" }, 0.12);
+          tl.fromTo("#name", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.34, ease: "power3.out" }, 0.14);
+          tl.fromTo("#row", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, Number(v.offerAt));
+          tl.to("#card", { opacity: 0, y: 24, duration: 0.24, ease: "power2.in" }, Number(v.outAt));
+          window.__timelines["brand"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

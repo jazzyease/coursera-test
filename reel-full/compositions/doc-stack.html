@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #root {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+        .stage {
+          position: absolute;
+          inset: 0;
+          perspective: 1600px;
+          perspective-origin: 50% 900px;
+        }
+        #docs {
+          position: absolute;
+          left: 220px;
+          top: 800px;
+          width: 640px;
+          height: 440px;
+          transform-style: preserve-3d;
+        }
+        .docs-float {
+          position: absolute;
+          inset: 0;
+          transform-style: preserve-3d;
+        }
+        /* Sheets are rendered at 2x (tools/make_assets.py); shown at 270x365. */
+        .sheet {
+          position: absolute;
+          left: 185px;
+          top: 20px;
+          width: 270px;
+          height: 365px;
+          border-radius: 5px;
+          box-shadow:
+            0 1px 0 rgba(255, 255, 255, 0.6) inset,
+            0 22px 44px rgba(14, 11, 16, 0.42),
+            0 3px 8px rgba(14, 11, 16, 0.28);
+        }
+        .sheet img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          border-radius: 5px;
+        }
+        .mark {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 270px;
+          height: 365px;
+          mix-blend-mode: multiply;
+        }
+        .sheen {
+          position: absolute;
+          inset: 0;
+          border-radius: 5px;
+          background: linear-gradient(112deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 62%);
+          background-size: 300% 100%;
+          mix-blend-mode: soft-light;
+        }
+      </style>
+
+      <div id="root" data-composition-id="doc-stack" data-width="1080" data-height="1920">
+        <div class="stage">
+          <div id="docs">
+            <div class="docs-float" id="docs-float"></div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          // Local time: this scene is mounted at 1.96s.
+          const $ = (s) => document.querySelector(s);
+          const host = $("#docs-float");
+          const SHEETS = [0, 1, 2, 3, 4].map((i) => {
+            const s = document.createElement("div");
+            s.className = "sheet";
+            s.id = "sheet-" + i;
+            s.innerHTML = '<img src="assets/props/sheet-' + i + '.png" alt="" />' + (i === 2 ? '<canvas class="mark" id="doc-mark" width="270" height="365"></canvas><div class="sheen" id="doc-sheen"></div>' : "");
+            host.appendChild(s);
+            return s;
+          });
+
+          // Hand-drawn marker ring around the key line (seeded jitter, drawn progressively).
+          const c = $("#doc-mark").getContext("2d");
+          let seed = 5;
+          const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+          const N = 120, pts = [];
+          for (let i = 0; i <= N; i++) {
+            const th = -0.6 + (i / N) * Math.PI * 2 * 1.1, j = 1 + (rnd() - 0.5) * 0.05;
+            pts.push([112 + Math.cos(th) * 108 * j * (1 + (i / N) * 0.05), 124 + Math.sin(th) * 19 * j]);
+          }
+          function drawMark(p) {
+            c.clearRect(0, 0, 270, 365);
+            if (p <= 0) return;
+            const n = Math.max(1, Math.floor((1 - Math.pow(1 - Math.min(1, p), 3)) * N));
+            c.strokeStyle = "rgba(196, 30, 42, 0.92)";
+            c.lineWidth = 4.5;
+            c.lineCap = "round";
+            c.lineJoin = "round";
+            c.beginPath();
+            c.moveTo(pts[0][0], pts[0][1]);
+            for (let i = 1; i <= n; i++) c.lineTo(pts[i][0], pts[i][1]);
+            c.stroke();
+          }
+
+          const float = $("#docs-float"), sheen = $("#doc-sheen");
+          function render(t) {
+            const ry = 3.5 * Math.sin(t * 2 + 1.3);
+            float.style.transform = "translate3d(0," + (5 * Math.sin(t * 2.4 + 1)).toFixed(2) + "px,0) rotateX(" + (6 + 2 * Math.sin(t * 1.6)).toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg)";
+            sheen.style.backgroundPosition = (60 - ry * 10).toFixed(1) + "% 50%";
+            drawMark((t - 2.06) / 0.34);
+          }
+
+          const tl = gsap.timeline({ paused: true });
+          const clock = { t: 0 };
+          tl.to(clock, { t: 2.6, duration: 2.6, ease: "none", onUpdate: () => render(clock.t) }, 0);
+          render(0);
+
+          tl.set("#docs", { autoAlpha: 1, z: 0 }, 0);
+          SHEETS.forEach((s, i) => {
+            const o = i - 2, k = Math.abs(o);
+            tl.set(s, { x: o * 64, y: k * 16 + 1150, z: -k * 24, rotation: o * 24 }, 0);
+            tl.to(s, { y: k * 16, rotation: o * 9, duration: 0.5, ease: "expo.out" }, 0.02 + k * 0.04);
+            if (o === 0) {
+              tl.to(s, { z: 90, y: -6, duration: 0.45, ease: "power3.out" }, 0.38);
+            } else {
+              tl.to(s, { y: "+=1300", rotation: o * 30, duration: 0.55, ease: "power2.in" }, 0.36 + (2 - k) * 0.05);
+              // Fade while falling so white sheets never sit behind the white caption line.
+              tl.to(s, { opacity: 0, duration: 0.2, ease: "power1.in" }, 0.4 + (2 - k) * 0.05);
+              tl.set(s, { autoAlpha: 0 }, 0.92 + (2 - k) * 0.05);
+            }
+          });
+          tl.to("#docs", { y: 40, autoAlpha: 0, duration: 0.2, ease: "power2.in" }, 2.38);
+
+          window.__timelines["doc-stack"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>
