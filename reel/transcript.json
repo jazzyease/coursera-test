@@ -1,0 +1,128 @@
+[
+ {
+  "id": "w0",
+  "text": "Your",
+  "start": 0.0,
+  "end": 0.32
+ },
+ {
+  "id": "w1",
+  "text": "visa",
+  "start": 0.32,
+  "end": 0.62
+ },
+ {
+  "id": "w2",
+  "text": "got",
+  "start": 0.62,
+  "end": 0.92
+ },
+ {
+  "id": "w3",
+  "text": "rejected,",
+  "start": 0.92,
+  "end": 1.48
+ },
+ {
+  "id": "w4",
+  "text": "and",
+  "start": 2.06,
+  "end": 2.16
+ },
+ {
+  "id": "w5",
+  "text": "this",
+  "start": 2.16,
+  "end": 2.34
+ },
+ {
+  "id": "w6",
+  "text": "one",
+  "start": 2.34,
+  "end": 2.64
+ },
+ {
+  "id": "w7",
+  "text": "document",
+  "start": 2.64,
+  "end": 3.14
+ },
+ {
+  "id": "w8",
+  "text": "is",
+  "start": 3.14,
+  "end": 3.54
+ },
+ {
+  "id": "w9",
+  "text": "probably",
+  "start": 3.54,
+  "end": 4.04
+ },
+ {
+  "id": "w10",
+  "text": "why.",
+  "start": 4.04,
+  "end": 4.44
+ },
+ {
+  "id": "w11",
+  "text": "Most",
+  "start": 5.18,
+  "end": 5.4
+ },
+ {
+  "id": "w12",
+  "text": "students",
+  "start": 5.4,
+  "end": 5.84
+ },
+ {
+  "id": "w13",
+  "text": "only",
+  "start": 5.84,
+  "end": 6.22
+ },
+ {
+  "id": "w14",
+  "text": "find",
+  "start": 6.22,
+  "end": 6.52
+ },
+ {
+  "id": "w15",
+  "text": "out",
+  "start": 6.52,
+  "end": 6.86
+ },
+ {
+  "id": "w16",
+  "text": "after",
+  "start": 6.86,
+  "end": 7.36
+ },
+ {
+  "id": "w17",
+  "text": "the",
+  "start": 7.36,
+  "end": 7.58
+ },
+ {
+  "id": "w18",
+  "text": "rejection",
+  "start": 7.58,
+  "end": 7.94
+ },
+ {
+  "id": "w19",
+  "text": "letter",
+  "start": 7.94,
+  "end": 8.32
+ },
+ {
+  "id": "w20",
+  "text": "arrives.",
+  "start": 8.32,
+  "end": 8.82
+ }
+]

@@ -1,0 +1,8 @@
+snapshots/
+.hyperframes/
+.thumbnails/
+_ref/
+.transcode-cache/
+tools/.fonts/
+tools/.portrait.png
+__pycache__/

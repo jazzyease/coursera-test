@@ -1,0 +1,135 @@
+        @font-face {
+          font-family: "Archivo";
+          src: url("assets/fonts/Archivo-Variable.woff2") format("woff2");
+          font-weight: 100 900;
+          font-stretch: 62% 125%;
+          font-style: normal;
+        }
+        @font-face {
+          font-family: "Archivo";
+          src: url("assets/fonts/Archivo-Italic-Variable.woff2") format("woff2");
+          font-weight: 100 900;
+          font-stretch: 62% 125%;
+          font-style: italic;
+        }
+        #root {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+          font-family: "Archivo", sans-serif;
+        }
+        /* Icon slot: built-in line icon, or assets/custom/<name>.png when supplied (ASSET_PROMPTS.md). */
+        .slot {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: none;
+        }
+        .slot svg {
+          width: 58%;
+          height: 58%;
+        }
+        .slot .slot-img {
+          position: absolute;
+          left: -16%;
+          top: -16%;
+          width: 132%;
+          height: 132%;
+          object-fit: contain;
+        }
+        .slot.has-img {
+          background: transparent !important;
+          box-shadow: none !important;
+        }
+        .card-light {
+          background: linear-gradient(180deg, #ffffff, #f1f0ea);
+          box-shadow:
+            inset 0 1px 0 #ffffff,
+            inset 0 -2px 0 rgba(14, 11, 16, 0.06),
+            0 26px 52px rgba(14, 11, 16, 0.45),
+            0 4px 10px rgba(14, 11, 16, 0.25);
+        }
+        .glass-dark {
+          background: rgba(22, 19, 27, 0.84);
+          box-shadow:
+            inset 0 0 0 2px rgba(251, 251, 246, 0.12),
+            inset 0 2px 0 rgba(251, 251, 246, 0.1),
+            0 26px 56px rgba(14, 11, 16, 0.55);
+        }
+        /* One soft light pass across a surface after it lands. */
+        .shine {
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          overflow: hidden;
+        }
+        .shine::before {
+          content: "";
+          position: absolute;
+          top: -20%;
+          bottom: -20%;
+          left: 0;
+          width: 38%;
+          background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+          transform: translateX(var(--sx, -140%)) skewX(-12deg);
+        }
+
+        /* ---------- v3 reference components (luemmy21 / tubetactix) ---------- */
+        /* White card: the "Storyblocks" card. Pure white, modest radius, one soft shadow. */
+        .wcard {
+          background: #ffffff;
+          border-radius: 26px;
+          box-shadow:
+            0 2px 0 rgba(255, 255, 255, 0.9) inset,
+            0 18px 40px rgba(8, 6, 10, 0.38),
+            0 3px 8px rgba(8, 6, 10, 0.22);
+        }
+        /* Lemon tile: the "1 2 3 / Pr" tile. Pale bevel edge, soft glow. */
+        .ltile {
+          border-radius: 34px;
+          background: linear-gradient(180deg, #feffc4 0%, #f6f98a 55%, #edf164 100%);
+          box-shadow:
+            inset 0 0 0 6px #fdfed2,
+            inset 0 -8px 14px rgba(170, 170, 30, 0.32),
+            0 0 30px rgba(248, 250, 140, 0.42),
+            0 16px 30px rgba(8, 6, 10, 0.42);
+          color: #15121a;
+        }
+        .ltile.dark {
+          background: linear-gradient(180deg, #2a2a33, #16151c);
+          box-shadow:
+            inset 0 0 0 6px #fdfed2,
+            0 0 30px rgba(248, 250, 140, 0.42),
+            0 16px 30px rgba(8, 6, 10, 0.42);
+          color: #f6f97f;
+        }
+        .tnum {
+          font-style: italic;
+          font-weight: 900;
+          font-stretch: 122%;
+          line-height: 1;
+          color: #15121a;
+        }
+        /* Light cutaway ground (luemmy21 UI scenes): cream -> pale lemon at the corners. */
+        .ground {
+          position: absolute;
+          inset: 0;
+          background:
+            radial-gradient(ellipse 70% 55% at 50% 48%, #ffffff 0%, rgba(255, 255, 255, 0) 70%),
+            linear-gradient(160deg, #fdffb6 0%, #fbfde2 42%, #fbfbf4 60%, #fdffc0 100%);
+        }
+        .ink-cap {
+          font-style: italic;
+          font-weight: 900;
+          font-stretch: 122%;
+          text-transform: uppercase;
+          line-height: 1.02;
+          color: #15121a;
+        }
+        .ink-cap .hl {
+          color: #15121a;
+          background: linear-gradient(180deg, transparent 58%, #f6f97f 58%, #f6f97f 92%, transparent 92%);
+          padding: 0 0.08em;
+        }

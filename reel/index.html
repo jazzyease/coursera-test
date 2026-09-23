@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1920">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Archivo";
+        src: url("assets/fonts/Archivo-Variable.woff2") format("woff2");
+        font-weight: 100 900;
+        font-stretch: 62% 125%;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Archivo";
+        src: url("assets/fonts/Archivo-Italic-Variable.woff2") format("woff2");
+        font-weight: 100 900;
+        font-stretch: 62% 125%;
+        font-style: italic;
+      }
+
+      /* DESIGN.md palette */
+      :root {
+        --night: #0e0b10;
+        --white: #fbfbf6;
+        --lime: #e6f54a;
+        --alarm: #ff2e3f;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--night);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--night);
+      }
+
+      /* ---------- Footage stack: all layers share one camera ---------- */
+      #cam {
+        position: absolute;
+        inset: 0;
+        transform-origin: 570px 610px; /* her face */
+      }
+      .layer {
+        position: absolute;
+        inset: 0;
+      }
+      .layer video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      #dim {
+        background:
+          radial-gradient(ellipse 70% 55% at 52% 42%, rgba(14, 11, 16, 0.28), rgba(14, 11, 16, 0.62)),
+          rgba(14, 11, 16, 0.12);
+      }
+      #redbg {
+        background: var(--alarm);
+        opacity: 0;
+      }
+      #bw-wrap,
+      #blur-wrap {
+        opacity: 0;
+      }
+      #flash {
+        position: absolute;
+        inset: 0;
+        background: var(--white);
+        opacity: 0;
+      }
+      /* Darkens desk/hands under the captions (applies above the cutout). */
+      #scrim {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 900px;
+        background: linear-gradient(to top, rgba(14, 11, 16, 0.78) 0%, rgba(14, 11, 16, 0.55) 45%, rgba(14, 11, 16, 0) 100%);
+      }
+
+      /* ---------- Captions ---------- */
+      #captions {
+        position: absolute;
+        left: 0;
+        top: 1170px;
+        width: 1080px;
+        height: 330px;
+        overflow: visible;
+      }
+      .cg {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        opacity: 0;
+        visibility: hidden;
+      }
+      .cl {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        line-height: 1;
+      }
+      /* Word = 3 stacked layers of the same glyphs:
+         ::before  dark extrusion (3D depth) + drop shadow, behind
+         face      solid colour + soft glow (what contrast checks read)
+         ::after   gradient fill + moving light sweep, clipped to the glyphs, in front */
+      .w {
+        position: relative;
+        isolation: isolate;
+        display: inline-block;
+        margin: 0 0.12em;
+        font-family: "Archivo", sans-serif;
+        font-style: italic;
+        font-weight: 900;
+        font-stretch: 118%;
+        text-transform: uppercase;
+        letter-spacing: -0.01em;
+        font-size: 80px;
+        line-height: 1.02;
+        transform-origin: 50% 70%;
+        --shine: -40%;
+        --fill: linear-gradient(180deg, #ffffff 0%, #f4f4ef 46%, #d4d6df 72%, #b3b6c4 100%);
+        --ext: #2b2731;
+        --glow: rgba(251, 251, 246, 0.18);
+        --glow2: rgba(14, 11, 16, 0.35);
+        color: var(--white);
+        text-shadow:
+          0 0 14px var(--glow),
+          0 0 30px var(--glow2);
+      }
+      .w::before,
+      .w::after {
+        content: attr(data-t);
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding: 0 0.16em 0.08em 0;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+      .w::before {
+        z-index: -1;
+        color: var(--ext);
+        text-shadow:
+          -0.018em 0 0 var(--ext),
+          0.018em 0 0 var(--ext),
+          0 -0.018em 0 var(--ext),
+          0.01em 0.012em 0 var(--ext),
+          0.02em 0.024em 0 var(--ext),
+          0.03em 0.036em 0 var(--ext),
+          0.04em 0.048em 0 var(--ext),
+          0.03em 0.12em 0.18em rgba(14, 11, 16, 0.75);
+      }
+      .w::after {
+        z-index: 1;
+        background:
+          linear-gradient(
+            104deg,
+            rgba(255, 255, 255, 0) calc(var(--shine) - 9%),
+            rgba(255, 255, 255, 0.95) var(--shine),
+            rgba(255, 255, 255, 0) calc(var(--shine) + 9%)
+          ),
+          var(--fill);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        text-shadow: none;
+      }
+      .w.lime {
+        color: var(--lime);
+        --fill: linear-gradient(180deg, #fcffd9 0%, #f0fb8a 34%, #e6f54a 58%, #b5cd10 100%);
+        --ext: #3f4a04;
+        --glow: rgba(230, 245, 74, 0.38);
+        --glow2: rgba(14, 11, 16, 0.3);
+      }
+      .w.red {
+        color: var(--alarm);
+        --fill: linear-gradient(180deg, #ffc2c9 0%, #ff6674 32%, #ff2e3f 58%, #b50b22 100%);
+        --ext: #4d0610;
+        --glow: rgba(255, 46, 63, 0.45);
+        --glow2: rgba(14, 11, 16, 0.3);
+      }
+      .badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 104px;
+        height: 104px;
+        margin-right: 22px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 36% 30%, #fcffd9 0%, #eefa7a 30%, #e6f54a 55%, #aac40c 100%);
+        box-shadow:
+          0 7px 0 #3f4a04,
+          0 0 0 6px var(--night),
+          0 7px 0 6px var(--night),
+          0 0 44px rgba(230, 245, 74, 0.75),
+          0 18px 30px rgba(14, 11, 16, 0.7);
+        font-family: "Archivo", sans-serif;
+        font-style: italic;
+        font-weight: 900;
+        font-stretch: 118%;
+        font-size: 70px;
+        color: var(--night);
+        line-height: 1;
+        padding-right: 6px;
+        text-shadow: 0 2px 0 rgba(251, 251, 246, 0.6);
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-a2ka" id="root" data-composition-id="main" data-start="0" data-duration="10.12" data-width="1080" data-height="1920">
+      <div data-hf-id="hf-ftaq" id="cam">
+        <div data-hf-id="hf-a8wf" class="layer">
+          <video data-hf-id="hf-pv4v" id="a-roll" class="clip" src="prachi-original-first-10s.mp4" muted playsinline data-start="0" data-duration="10.12" data-track-index="0"></video>
+        </div>
+        <div data-hf-id="hf-dd6x" class="layer" id="dim"></div>
+        <div data-hf-id="hf-10av" class="layer" id="redbg"></div>
+        <!-- Subject cutout (hyperframes remove-background) re-laid over the dimmed room -->
+        <div data-hf-id="hf-j20a" class="layer" id="cutout-wrap">
+          <video data-hf-id="hf-8hoq" id="subject" class="clip" src="assets/media/subject.webm" muted playsinline data-start="0" data-media-start="0" data-duration="10.12" data-track-index="1"></video>
+        </div>
+        <div data-hf-id="hf-xzop" class="layer" id="bw-wrap">
+          <video data-hf-id="hf-2d7f" id="bw" class="clip" src="assets/media/bw.mp4" muted playsinline data-start="0" data-media-start="0" data-duration="10.12" data-track-index="2"></video>
+        </div>
+        <div data-hf-id="hf-nzl7" class="layer" id="blur-wrap">
+          <video data-hf-id="hf-gcyq" id="blur" class="clip" src="assets/media/blur.mp4" muted playsinline data-start="0" data-media-start="0" data-duration="10.12" data-track-index="3"></video>
+        </div>
+      </div>
+      <div data-hf-id="hf-wmg9" id="scrim"></div>
+      <div data-hf-id="hf-hmg5" id="flash"></div>
+
+      <audio data-hf-id="hf-2b9h" id="a-roll-audio" src="prachi-original-first-10s.mp4" data-start="0" data-duration="10.03" data-track-index="10" data-volume="1"></audio>
+      <!-- SFX from the HyperFrames bundled library, mixed under the voice -->
+      <audio data-hf-id="hf-lkd7" id="sfx-pp-in" src="assets/sfx/whoosh-short.mp3" data-start="0.02" data-duration="0.57" data-track-index="15" data-volume="0.3"></audio>
+      <audio data-hf-id="hf-97j0" id="sfx-fan" src="assets/sfx/whoosh.mp3" data-start="1.96" data-duration="0.57" data-track-index="15" data-volume="0.26"></audio>
+      <audio data-hf-id="hf-wyc6" id="sfx-flap" src="assets/sfx/click-soft.mp3" data-start="8.44" data-duration="0.36" data-track-index="16" data-volume="0.5"></audio>
+      <audio data-hf-id="hf-avpq" id="sfx-rejected" src="assets/sfx/impact-bass-1.mp3" data-start="0.94" data-duration="1.2" data-track-index="11" data-volume="0.32"></audio>
+      <audio data-hf-id="hf-or83" id="sfx-badge" src="assets/sfx/pop.mp3" data-start="2.3" data-duration="0.7" data-track-index="12" data-volume="0.3"></audio>
+      <audio data-hf-id="hf-oezk" id="sfx-doc" src="assets/sfx/whoosh-short.mp3" data-start="2.3" data-duration="0.57" data-track-index="13" data-volume="0.34"></audio>
+      <audio data-hf-id="hf-7x2j" id="sfx-why" src="assets/sfx/click.mp3" data-start="4.02" data-duration="0.36" data-track-index="14" data-volume="0.4"></audio>
+      <audio data-hf-id="hf-m161" id="sfx-blur" src="assets/sfx/whoosh.mp3" data-start="4.36" data-duration="0.57" data-track-index="12" data-volume="0.3"></audio>
+      <audio data-hf-id="hf-t2pq" id="sfx-cut" src="assets/sfx/click.mp3" data-start="5.12" data-duration="0.36" data-track-index="14" data-volume="0.3"></audio>
+      <audio data-hf-id="hf-hk8n" id="sfx-bw" src="assets/sfx/impact-bass-1.mp3" data-start="7.52" data-duration="0.9" data-track-index="11" data-volume="0.2"></audio>
+      <audio data-hf-id="hf-bmf7" id="sfx-letter" src="assets/sfx/whoosh-short.mp3" data-start="8.04" data-duration="0.57" data-track-index="13" data-volume="0.34"></audio>
+      <audio data-hf-id="hf-gxh9" id="sfx-stamp" src="assets/sfx/impact-bass-1.mp3" data-start="9.02" data-duration="1.2" data-track-index="11" data-volume="0.36"></audio>
+      <!-- JS-driven 3D objects + canvas FX, one reusable sub-composition per story beat, under the captions -->
+      <div data-hf-id="hf-th16" id="fx-pp" style="position: absolute; inset: 0">
+        <div data-hf-id="hf-s7lz" id="passport" data-composition-id="passport" data-composition-src="compositions/passport.html" data-start="0" data-duration="1.98" data-track-index="4" data-width="1080" data-height="1920"></div>
+      </div>
+      <div data-hf-id="hf-8egx" id="fx-docs" style="position: absolute; inset: 0">
+        <div data-hf-id="hf-4o21" id="doc-stack" data-composition-id="doc-stack" data-composition-src="compositions/doc-stack.html" data-start="1.96" data-duration="2.6" data-track-index="5" data-width="1080" data-height="1920"></div>
+      </div>
+      <div data-hf-id="hf-hmcp" id="fx-env" style="position: absolute; inset: 0">
+        <div data-hf-id="hf-vqkn" id="envelope" data-composition-id="envelope" data-composition-src="compositions/envelope.html" data-start="8.02" data-duration="2.1" data-track-index="7" data-width="1080" data-height="1920"></div>
+      </div>
+
+      <div data-hf-id="hf-xv45" id="captions" class="clip" data-start="0" data-duration="10.12" data-track-index="6"></div>
+    </div>
+
+    <script>
+      // Word timings: faster-whisper medium.en; "Most" confirmed by large-v3 (see transcript.json).
+      const W = [
+        [0.0, "Your"], [0.32, "visa"], [0.62, "got"], [0.92, "rejected"],
+        [2.06, "and"], [2.16, "this"], [2.34, "one"], [2.64, "document"],
+        [3.14, "is"], [3.54, "probably"], [4.04, "why"],
+        [5.18, "Most"], [5.4, "students"], [5.84, "only"], [6.22, "find"], [6.52, "out"],
+        [6.86, "after"], [7.36, "the"], [7.58, "rejection"], [7.94, "letter"], [8.32, "arrives"],
+      ];
+
+      // Phrase groups: line 1 (white) + line 2 (accent), per references.
+      // Sizes are pre-computed so every line fits within ~940px (Archivo 900 italic ≈ 0.8em/char).
+      const GROUPS = [
+        { start: 0.0, end: 1.96, l1: [0, 1, 2], l2: [[3]], tone: "red", size: 140, hero: [3] },
+        { start: 1.96, end: 3.1, l1: [4, 5], l2: [[6, 7]], tone: "lime", size: 84, badge: { before: 6, text: "1" } },
+        { start: 3.1, end: 4.44, l1: [8, 9], l2: [[10]], tone: "lime", size: 156, hero: [10] },
+        { start: 5.12, end: 6.84, l1: [11, 12], l2: [[13, 14, 15]], tone: "lime", size: 88 },
+        { start: 6.84, end: 8.28, l1: [16, 17], l2: [[18], [19]], tone: "red", size: 124 },
+        { start: 8.28, end: 10.12, l1: [], l2: [[20]], tone: "white", size: 156, hero: [20] },
+      ];
+
+      const FPS = 25;
+      const LEAD = 0.04;
+      const tl = gsap.timeline({ paused: true });
+
+      // ---------- Reusable pieces ----------
+      const cam = (vars, at, duration = 0, ease = "none") =>
+        duration ? tl.to("#cam", { ...vars, duration, ease }, at) : tl.set("#cam", vars, at);
+
+      function shake(at, amp) {
+        const f = 1 / FPS;
+        tl.to("#cam", { x: amp, y: -amp * 0.6, duration: f, ease: "none" }, at);
+        tl.to("#cam", { x: -amp * 0.8, y: amp * 0.5, duration: f, ease: "none" }, at + f);
+        tl.to("#cam", { x: 0, y: 0, duration: f * 2, ease: "power1.out" }, at + 2 * f);
+      }
+
+      function wordEl(wi, cls) {
+        const s = document.createElement("span");
+        s.className = "w " + cls;
+        s.id = "w-" + wi;
+        s.textContent = W[wi][1];
+        s.dataset.t = W[wi][1]; // feeds the ::before extrusion and ::after gradient layers
+        return s;
+      }
+
+      function buildGroup(g, gi) {
+        const el = document.createElement("div");
+        el.className = "cg tone-" + g.tone;
+        el.id = "cg-" + gi;
+        if (g.l1.length) {
+          const l1 = document.createElement("div");
+          l1.className = "cl l1";
+          g.l1.forEach((wi) => l1.appendChild(wordEl(wi, "")));
+          el.appendChild(l1);
+        }
+        g.l2.forEach((line) => {
+          const l2 = document.createElement("div");
+          l2.className = "cl l2";
+          line.forEach((wi) => {
+            if (g.badge && g.badge.before === wi) {
+              const b = document.createElement("span");
+              b.className = "badge";
+              b.id = "badge-" + gi;
+              b.textContent = g.badge.text;
+              l2.appendChild(b);
+            }
+            const tone = g.tone === "white" ? "" : g.tone;
+            const w = wordEl(wi, tone);
+            w.style.fontSize = g.size + "px";
+            l2.appendChild(w);
+          });
+          el.appendChild(l2);
+        });
+        document.getElementById("captions").appendChild(el);
+      }
+
+      // Line-1 words ghost in, then snap solid (luemmy21 treatment).
+      function ghostIn(sel, t) {
+        tl.fromTo(sel, { opacity: 0, scale: 1.14 }, { opacity: 0.42, scale: 1.04, duration: 0.06, ease: "none" }, t);
+        tl.to(sel, { opacity: 1, scale: 1, duration: 0.1, ease: "power2.out" }, t + 0.06);
+      }
+      // Accent words slide in from the left with their glow.
+      function slideIn(sel, t) {
+        tl.fromTo(sel, { opacity: 0, x: -46, skewX: -10 }, { opacity: 1, x: 0, skewX: 0, duration: 0.22, ease: "expo.out" }, t);
+      }
+      // Hero words land with a short scale-down; no overshoot.
+      function slam(sel, t) {
+        tl.fromTo(sel, { opacity: 0, scale: 1.28 }, { opacity: 1, scale: 1, duration: 0.16, ease: "power3.out" }, t - 0.06);
+      }
+      function shine(sel, t, dur = 0.5) {
+        tl.fromTo(sel, { "--shine": "-40%" }, { "--shine": "140%", duration: dur, ease: "power2.inOut" }, t);
+      }
+
+      GROUPS.forEach((g, gi) => {
+        buildGroup(g, gi);
+        const el = "#cg-" + gi;
+        tl.set(el, { opacity: 1, visibility: "visible" }, g.start);
+        // One slow light pass across hero words only.
+        (g.hero || []).forEach((wi) => shine("#w-" + wi, W[wi][0] + 0.3, 0.7));
+        g.l1.forEach((wi) => (W[wi][0] < 0.9 ? tl.set("#w-" + wi, { opacity: 1 }, 0) : ghostIn("#w-" + wi, W[wi][0] - LEAD)));
+        g.l2.flat().forEach((wi) => {
+          const t = W[wi][0] - LEAD;
+          if (g.hero && g.hero.includes(wi)) slam("#w-" + wi, W[wi][0]);
+          else slideIn("#w-" + wi, t);
+        });
+        if (g.badge) {
+          const t = W[g.badge.before][0] - 0.06;
+          tl.fromTo("#badge-" + gi, { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.3, ease: "back.out(2.4)" }, t);
+        }
+        // Hard swap, as in the references.
+        tl.set(el, { opacity: 0, visibility: "hidden" }, g.end);
+      });
+
+      // ---------- Colour moments ----------
+      // Red background behind her on "rejected".
+      tl.set("#redbg", { opacity: 1 }, 0.94);
+      tl.to("#redbg", { opacity: 0, duration: 0.3, ease: "power2.in" }, 1.6);
+
+      // Black-and-white from "rejection" to the end; the red type and stamp stay the only colour.
+      tl.set("#flash", { opacity: 0.4 }, 7.54);
+      tl.to("#flash", { opacity: 0, duration: 0.16, ease: "power2.out" }, 7.58);
+      tl.set("#bw-wrap", { opacity: 1 }, 7.54);
+
+      // Blur transition across the pause between sentences.
+      tl.to("#blur-wrap", { opacity: 1, duration: 0.16, ease: "power2.in" }, 4.4);
+      tl.to("#blur-wrap", { opacity: 0, duration: 0.06, ease: "none" }, 5.08);
+
+      // ---------- Camera ----------
+      // Hook: open slightly tight and settle out so frame 0 already moves.
+      cam({ scale: 1.16, x: 0, y: 0 }, 0);
+      cam({ scale: 1.04 }, 0, 0.45, "power3.out");
+      cam({ scale: 1.08 }, 0.45, 0.45);
+      cam({ scale: 1.16 }, 0.92, 0.14, "power3.out"); // "rejected"
+      shake(0.96, 5);
+      cam({ scale: 1.24 }, 1.05, 0.9);
+      cam({ scale: 1.0 }, 1.96); // jump zoom out
+      cam({ scale: 1.08 }, 1.96, 2.44);
+      cam({ scale: 1.2 }, 4.4, 0.7, "power2.in"); // push through the blur
+      cam({ scale: 1.14 }, 5.12); // jump in tight
+      cam({ scale: 1.18 }, 5.12, 1.72);
+      cam({ scale: 1.02 }, 6.84); // jump out
+      cam({ scale: 1.05 }, 6.84, 0.7);
+      cam({ scale: 1.16 }, 7.54, 0.14, "power3.out"); // "rejection"
+      cam({ scale: 1.22 }, 7.7, 0.58);
+      cam({ scale: 1.06 }, 8.28); // jump out for the letter
+      cam({ scale: 1.12 }, 8.28, 1.84);
+      shake(9.05, 4); // stamp lands
+
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

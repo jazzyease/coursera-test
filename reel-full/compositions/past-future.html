@@ -1,0 +1,128 @@
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"pastAt","type":"number","label":"PAST appears (local s)","default":0.8,"step":0.01},
+    {"id":"futureAt","type":"number","label":"FUTURE appears (local s)","default":1.6,"step":0.01},
+    {"id":"lineAt","type":"number","label":"Line draws (local s)","default":2.4,"step":0.01},
+    {"id":"outAt","type":"number","label":"Exit (local s)","default":3.9,"step":0.01},
+    {"id":"dur","type":"number","label":"Instance length (s)","default":4.2,"step":0.01}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        @font-face {
+          font-family: "Archivo";
+          src: url("assets/fonts/Archivo-Italic-Variable.woff2") format("woff2");
+          font-weight: 100 900;
+          font-stretch: 62% 125%;
+          font-style: italic;
+        }
+        #root {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+        /* One clean line: two nodes on a rail at chest height. */
+        .pf {
+          position: absolute;
+          left: 150px;
+          top: 930px;
+          width: 780px;
+          height: 150px;
+        }
+        .rail,
+        .fill {
+          position: absolute;
+          left: 30px;
+          top: 44px;
+          width: 720px;
+          height: 6px;
+          border-radius: 3px;
+        }
+        .rail {
+          background: rgba(251, 251, 246, 0.25);
+        }
+        .fill {
+          background: linear-gradient(90deg, #fbfbf6, #f6f97f);
+          box-shadow: 0 0 14px rgba(246, 249, 127, 0.45);
+          transform-origin: left center;
+        }
+        .node {
+          position: absolute;
+          top: 29px;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: #fbfbf6;
+          box-shadow:
+            0 0 0 6px rgba(14, 11, 16, 0.55),
+            0 8px 18px rgba(14, 11, 16, 0.5);
+        }
+        .node.past {
+          left: 12px;
+        }
+        .node.future {
+          left: 732px;
+          background: #f6f97f;
+        }
+        .lab {
+          position: absolute;
+          top: 86px;
+          width: 240px;
+          font-family: "Archivo", sans-serif;
+          font-style: italic;
+          font-weight: 900;
+          font-stretch: 118%;
+          font-size: 44px;
+          letter-spacing: 0.02em;
+          color: #fbfbf6;
+          text-shadow: 0 3px 12px rgba(14, 11, 16, 0.7);
+        }
+        .lab.past {
+          left: -90px;
+          text-align: center;
+        }
+        .lab.future {
+          left: 630px;
+          text-align: center;
+          color: #f6f97f;
+        }
+      </style>
+
+      <div id="root" data-composition-id="past-future" data-width="1080" data-height="1920">
+        <div class="pf" id="pf">
+          <span class="rail"></span>
+          <span class="fill" id="pf-fill"></span>
+          <span class="node past" id="pf-n1"></span>
+          <span class="node future" id="pf-n2"></span>
+          <div class="lab past" id="pf-l1">PAST</div>
+          <div class="lab future" id="pf-l2">FUTURE</div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          const v = window.__hyperframes.getVariables();
+          const P = Number(v.pastAt), F = Number(v.futureAt), L = Number(v.lineAt), O = Number(v.outAt);
+          const tl = gsap.timeline({ paused: true });
+          tl.set(".rail", { scaleX: 0, transformOrigin: "left center" }, 0);
+          tl.to(".rail", { scaleX: 1, duration: 0.5, ease: "power2.out" }, P);
+          tl.fromTo("#pf-n1", { scale: 0 }, { scale: 1, duration: 0.28, ease: "power3.out" }, P);
+          tl.fromTo("#pf-l1", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.24, ease: "power2.out" }, P + 0.04);
+          tl.fromTo("#pf-n2", { scale: 0 }, { scale: 1, duration: 0.28, ease: "power3.out" }, F);
+          tl.fromTo("#pf-l2", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.24, ease: "power2.out" }, F + 0.04);
+          tl.fromTo("#pf-fill", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power2.inOut" }, L);
+          tl.to("#pf-n2", { scale: 1.25, duration: 0.1, ease: "power2.out" }, L + 0.58);
+          tl.to("#pf-n2", { scale: 1, duration: 0.3, ease: "power2.out" }, L + 0.68);
+          tl.to("#pf", { opacity: 0, y: 20, duration: 0.25, ease: "power2.in" }, O);
+          window.__timelines["past-future"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>
